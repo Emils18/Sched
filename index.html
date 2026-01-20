@@ -58,12 +58,15 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .text-gradient { background: linear-gradient(to right, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Tabs */
+        .tab-active { background-color: #3b82f6; color: white; border-color: transparent; }
+        .tab-inactive { background-color: transparent; color: #94a3b8; border: 1px solid #334155; }
     </style>
 </head>
 <body class="selection:bg-indigo-500 selection:text-white">
 
     <!-- 1. DYNAMIC NEWS BAR (Remote Control) -->
-    <!-- It is hidden by default. Use npoint.io to turn it on remotely! -->
     <div id="news-bar" class="hidden w-full bg-blue-600 text-white text-center py-2 text-sm font-bold animate-pulse z-50 relative shadow-lg">
         <span id="news-text">Loading updates...</span>
         <button onclick="this.parentElement.style.display='none'" class="absolute right-4 top-1.5 text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -86,7 +89,7 @@
             </div>
             
             <div class="flex gap-3">
-                <button onclick="toggleModal('videoModal')" class="glass-btn px-5 py-3 rounded-full flex items-center gap-2 group">
+                <button onclick="toggleVideo()" class="glass-btn px-5 py-3 rounded-full flex items-center gap-2 group">
                     <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                     <span class="text-sm font-semibold tracking-wide text-slate-300 group-hover:text-white">Watch Tutorial</span>
                 </button>
@@ -168,45 +171,73 @@
 
     </main>
 
-    <!-- VIDEO MODAL -->
+    <!-- NEW: DUAL TAB VIDEO MODAL -->
     <div id="videoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-opacity duration-300">
-        <div class="absolute inset-0" onclick="toggleModal('videoModal')"></div>
+        <div class="absolute inset-0" onclick="toggleVideo()"></div>
         <div class="glass-panel w-full max-w-4xl rounded-2xl overflow-hidden relative z-10 transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
             
+            <!-- Modal Header -->
             <div class="flex justify-between items-center p-5 border-b border-white/10 bg-white/5">
                 <h3 class="font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-play-circle text-blue-500"></i> Tutorial
+                    <i class="fa-solid fa-play-circle text-blue-500"></i> How to Use
                 </h3>
-                <button onclick="toggleModal('videoModal')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white">
+                <button onclick="toggleVideo()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="aspect-video bg-black flex items-center justify-center">
-                <!-- IMPORTANT: Make sure this exact filename exists in your folder -->
-                <video id="tutorialVideo" class="w-full h-full object-contain" controls playsinline>
-                    <source src="2026-01-20 12-21-41.mp4" type="video/mp4">
-                    <p class="text-slate-400 p-4">Video file not found. Please ensure '2026-01-20 12-21-41.mp4' is in the same folder as this file.</p>
-                </video>
+            <!-- TABS -->
+            <div class="flex p-2 bg-slate-900/50 gap-2 border-b border-white/5">
+                <button onclick="switchTab('mobile')" id="btn-mobile" class="glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg text-center transition-all">
+                    <i class="fa-solid fa-mobile-screen mr-2"></i> Mobile
+                </button>
+                <button onclick="switchTab('desktop')" id="btn-desktop" class="glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg text-center transition-all">
+                    <i class="fa-solid fa-desktop mr-2"></i> Desktop
+                </button>
+            </div>
+
+            <!-- VIDEO CONTAINER -->
+            <div class="p-4 bg-black/40">
+                
+                <!-- MOBILE VIEW -->
+                <div id="view-mobile">
+                    <div class="aspect-video bg-black rounded-lg overflow-hidden border border-slate-700 mb-3 relative">
+                        <video id="vid-mobile" class="w-full h-full object-contain" controls playsinline>
+                            <!-- MOBILE VIDEO FILE -->
+                            <source src="mon.mp4" type="video/mp4">
+                            <p class="text-slate-500 text-sm flex items-center justify-center h-full">File 'mobile_tutorial.mp4' not found.</p>
+                        </video>
+                    </div>
+                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Open PDF > Select All > Copy > Paste Here.</p>
+                </div>
+
+                <!-- DESKTOP VIEW (Hidden) -->
+                <div id="view-desktop" class="hidden">
+                    <div class="aspect-video bg-black rounded-lg overflow-hidden border border-slate-700 mb-3 relative">
+                        <video id="vid-desktop" class="w-full h-full object-contain" controls playsinline>
+                            <!-- DESKTOP VIDEO FILE -->
+                            <source src="2026-01-20 12-21-41.mp4" type="video/mp4">
+                            <p class="text-slate-500 text-sm flex items-center justify-center h-full">File 'desktop_tutorial.mp4' not found.</p>
+                        </video>
+                    </div>
+                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Portal > Ctrl+A > Ctrl+C > Paste Here.</p>
+                </div>
+
             </div>
         </div>
     </div>
 
     <script>
         // --- CONFIGURATION ---
-        // If you create an npoint.io link later, paste it here.
-        // Example: "https://api.npoint.io/abc123456"
         const REMOTE_DB_URL = ""; 
 
-        // --- 1. SYSTEM INIT (Auto-Save + Remote Config) ---
+        // --- 1. SYSTEM INIT ---
         window.onload = function() {
-            // Load Saved Data
             const savedData = localStorage.getItem('uc_schedule_data');
             if(savedData) {
                 document.getElementById('rawInput').value = savedData;
                 processSchedule();
             }
-            // Check for Remote Updates
             if(REMOTE_DB_URL) checkRemoteUpdates();
         }
 
@@ -226,19 +257,41 @@
             } catch (e) { console.log("No updates found"); }
         }
 
-        // --- 2. DATA MANAGEMENT ---
-        function clearData() {
-            if(confirm("Clear your saved schedule?")) {
-                localStorage.removeItem('uc_schedule_data');
-                document.getElementById('rawInput').value = '';
-                location.reload();
+        // --- 2. VIDEO TAB LOGIC ---
+        function switchTab(mode) {
+            const mobileView = document.getElementById('view-mobile');
+            const desktopView = document.getElementById('view-desktop');
+            const mobileBtn = document.getElementById('btn-mobile');
+            const desktopBtn = document.getElementById('btn-desktop');
+            
+            // Pause videos
+            document.getElementById('vid-mobile').pause();
+            document.getElementById('vid-desktop').pause();
+
+            if (mode === 'mobile') {
+                mobileView.classList.remove('hidden');
+                desktopView.classList.add('hidden');
+                
+                mobileBtn.classList.add('tab-active');
+                mobileBtn.classList.remove('tab-inactive');
+                
+                desktopBtn.classList.remove('tab-active');
+                desktopBtn.classList.add('tab-inactive');
+            } else {
+                desktopView.classList.remove('hidden');
+                mobileView.classList.add('hidden');
+
+                desktopBtn.classList.add('tab-active');
+                desktopBtn.classList.remove('tab-inactive');
+
+                mobileBtn.classList.remove('tab-active');
+                mobileBtn.classList.add('tab-inactive');
             }
         }
 
-        function toggleModal(modalID) {
-            const modal = document.getElementById(modalID);
+        function toggleVideo() {
+            const modal = document.getElementById('videoModal');
             const content = document.getElementById('modalContent');
-            const video = document.getElementById('tutorialVideo');
 
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
@@ -249,12 +302,23 @@
             } else {
                 content.classList.remove('scale-100', 'opacity-100');
                 content.classList.add('scale-95', 'opacity-0');
-                if(video) { video.pause(); video.currentTime = 0; }
+                // Pause All
+                document.getElementById('vid-mobile').pause();
+                document.getElementById('vid-desktop').pause();
                 setTimeout(() => { modal.classList.add('hidden'); }, 300);
             }
         }
 
-        // --- 3. THE SCANNER ENGINE (Robust Parsing) ---
+        // --- 3. DATA MANAGEMENT ---
+        function clearData() {
+            if(confirm("Clear your saved schedule?")) {
+                localStorage.removeItem('uc_schedule_data');
+                document.getElementById('rawInput').value = '';
+                location.reload();
+            }
+        }
+
+        // --- 4. THE SCANNER ENGINE ---
         function processSchedule() {
             const raw = document.getElementById('rawInput').value;
             if(!raw.trim()) {
@@ -273,7 +337,7 @@
             lines.forEach(line => {
                 let cleanLine = line.replace(/\t/g, ' ').trim();
                 
-                // 1. STRICT FILTER: Only lines starting with 5 Digits (EDP Code)
+                // STRICT FILTER: 5 Digits EDP
                 const edpMatch = cleanLine.match(/^(\d{5})/);
                 if (!edpMatch) return; 
                 const edpCode = edpMatch[1];
@@ -289,15 +353,11 @@
                     const startTime = timeMatch[1];
                     const day = dayMatch[0].toUpperCase();
                     
-                    // 2. SUBJECT EXTRACTION
-                    // Remove EDP code, then split by Day string. Take the left part.
                     let middlePart = cleanLine.replace(edpCode, '').split(dayMatch[0])[0].trim();
                     let parts = middlePart.split(/\s+/);
                     
-                    // Remove trailing numbers (Units)
                     if(parts.length > 0 && /^\d$/.test(parts[parts.length-1])) parts.pop();
 
-                    // Remove trailing Types (LEC, LAB, L)
                     let lastWord = parts[parts.length-1];
                     let type = "LEC"; 
                     if(lastWord && ['LAB','LEC','L'].includes(lastWord)) {
@@ -306,13 +366,9 @@
                     }
                     const subject = parts.join(" ");
 
-                    // 3. ROOM EXTRACTION
-                    // Everything after the time range
                     const afterTime = cleanLine.split(fullTime)[1] || "";
-                    // Allow letters, numbers, and dashes. Don't strip spaces entirely, just trim.
-                    let room = afterTime.trim().split(/\s{2,}/)[0]; // Split by double space to avoid capturing extra columns
-                    if(!room) room = afterTime.trim().split(/\s+/)[0]; // Fallback
-                    if(!room) room = "TBA";
+                    let room = afterTime.trim().split(/\s{2,}/)[0] || afterTime.trim().split(/\s+/)[0] || "TBA";
+                    room = room.replace(/[^a-zA-Z0-9-]/g, '');
 
                     const item = {
                         edp: edpCode,
