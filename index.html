@@ -3,25 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC Schedule | Sorter AI</title>
+    <title>UC Schedule Sorter</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTML2CANVAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Gloria+Hallelujah&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
     <script>
-        tailwind.config = {
+
+
+   tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Outfit"', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                         mono: ['"JetBrains Mono"', 'monospace'],
+                        // NEW FONTS ADDED HERE:
+                        hand: ['"Gloria Hallelujah"', 'cursive'],
+                        cyber: ['"Orbitron"', 'sans-serif'],
                     },
                     animation: {
                         'blob': 'blob 10s infinite',
-                        'fade-up': 'fadeUp 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'bounce-slow': 'bounce 3s infinite', // Added for the floating button
                     },
                     keyframes: {
                         blob: {
@@ -30,8 +38,8 @@
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         },
-                        fadeUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
@@ -42,42 +50,42 @@
     <style>
         body { background-color: #030712; color: white; overflow-x: hidden; }
         
-        /* Background Animation */
+        /* Dynamic Theme Variables */
+        :root {
+            --theme-primary: #3b82f6; 
+            --theme-secondary: #a855f7;
+        }
+
         .ambient-light { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .shape { position: absolute; filter: blur(90px); opacity: 0.4; animation: blob 10s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-        .shape-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: #4f46e5; }
-        .shape-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #db2777; animation-delay: 2s; }
+        .shape-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: var(--theme-primary); transition: background 1s ease; }
+        .shape-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: var(--theme-secondary); transition: background 1s ease; }
         
-        /* Glass Effects */
-        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
         .glass-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); transition: all 0.3s ease; }
-        .glass-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; transition: all 0.2s; }
+        .glass-input:focus { border-color: #3b82f6; ring: 2px solid rgba(59, 130, 246, 0.2); outline: none; }
         
-        textarea:focus { outline: none; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        .text-gradient { background: linear-gradient(to right, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-gradient { 
+            background: linear-gradient(to right, var(--theme-primary), var(--theme-secondary)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
 
         /* Tabs */
-        .tab-active { background-color: #3b82f6; color: white; border-color: transparent; }
+        .tab-active { background-color: var(--theme-primary); color: white; border-color: transparent; }
         .tab-inactive { background-color: transparent; color: #94a3b8; border: 1px solid #334155; }
     </style>
 </head>
-<body class="selection:bg-indigo-500 selection:text-white">
-
-    <!-- 1. DYNAMIC NEWS BAR (Remote Control) -->
-    <div id="news-bar" class="hidden w-full bg-blue-600 text-white text-center py-2 text-sm font-bold animate-pulse z-50 relative shadow-lg">
-        <span id="news-text">Loading updates...</span>
-        <button onclick="this.parentElement.style.display='none'" class="absolute right-4 top-1.5 text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-    </div>
+<body class="selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col">
 
     <div class="ambient-light">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 py-10 md:py-16">
+    <!-- Main Content Wrapper -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-10 md:py-16 w-full">
         
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 animate-fade-up">
@@ -85,7 +93,7 @@
                 <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-2">
                     Study Load <br> <span class="text-gradient">Sorter AI</span>
                 </h1>
-                <p class="text-slate-400 font-light text-lg">Kapoy Manual?, gamita ni, fast and simple gamiton.</p>
+                <p class="text-slate-400 font-light text-lg">Paste text. Choose design. Save image.</p>
             </div>
             
             <div class="flex gap-3">
@@ -95,21 +103,21 @@
                 </button>
                 <button onclick="loadExample()" class="glass-btn px-5 py-3 rounded-full flex items-center gap-2">
                     <i class="fa-solid fa-code text-blue-400"></i>
-                    <span class="text-sm font-semibold tracking-wide text-slate-300">Load Example</span>
+                    <span class="text-sm font-semibold tracking-wide text-slate-300">Sample</span>
                 </button>
             </div>
         </header>
 
         <!-- Input Section -->
-        <div class="glass-panel rounded-3xl p-1 mb-16 animate-fade-up" style="animation-delay: 0.1s;">
+        <div class="glass-panel rounded-3xl p-1 mb-16 animate-fade-in">
             <div class="bg-[#0f172a]/60 rounded-[20px] p-6 md:p-10 relative overflow-hidden group">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
 
                 <div class="flex justify-between items-center mb-4">
-                    <label class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Paste Schedule Table</label>
+                    <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Paste Schedule Table</label>
                     <div class="flex gap-2">
                         <button onclick="clearData()" class="text-[10px] bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1 rounded hover:bg-red-500/20 transition">
-                            <i class="fa-solid fa-trash"></i> Clear Saved
+                            <i class="fa-solid fa-trash"></i> Clear
                         </button>
                         <div class="text-[10px] bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 font-mono">
                             CTRL + V
@@ -121,45 +129,62 @@
                 placeholder="Paste directly from your study load...&#10;41200 CC-TECHNO32 3 MWF 3:30 PM - 4:30 PM"></textarea>
 
                 <div class="mt-8 flex justify-end">
-                    <button onclick="processSchedule()" class="relative overflow-hidden bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-xl transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] active:scale-95 group">
+                    <button id="genBtn" onclick="processSchedule()" class="relative overflow-hidden bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-xl transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] active:scale-95 group">
                         <span class="relative z-10 flex items-center gap-2">
-                            Generate Schedule <i class="fa-solid fa-bolt"></i>
+                            Generate <i class="fa-solid fa-bolt"></i>
                         </span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Output Grid -->
-        <div id="resultArea" class="hidden grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- MWF -->
-            <div class="space-y-4 animate-fade-up" style="animation-delay: 0.2s;">
-                <div class="flex items-center gap-3 pb-2 border-b border-white/5">
-                    <div class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></div>
-                    <h2 class="font-bold text-xl text-slate-200">Mon / Wed / Fri</h2>
-                    <span id="cnt-mwf" class="ml-auto text-xs font-mono text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">0</span>
+        <!-- CONTROL BAR (Design & Department) -->
+        <div id="toolbar" class="hidden mb-8 animate-fade-in">
+            <div class="glass-panel p-4 rounded-xl flex flex-col xl:flex-row justify-between items-center gap-4">
+                
+                <!-- Department Theme -->
+                <div class="flex items-center gap-2 w-full xl:w-auto">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Dept:</span>
+                    <select id="deptSelect" onchange="changeTheme(this.value)" class="bg-slate-800 text-white text-sm rounded-lg p-2 border border-slate-600 focus:ring-blue-500 focus:border-blue-500 flex-1">
+                        <option value="BSIT">BSIT / CCS</option>
+                        <option value="MARITIME">Maritime</option>
+                        <option value="ENGINEERING">Engineering</option>
+                        <option value="CUSTOMS">Customs</option>
+                        <option value="EDUCATION">Education</option>
+                    </select>
                 </div>
-                <div id="list-mwf" class="space-y-4"></div>
+
+                <!-- Design Picker -->
+                <div class="flex items-center gap-2 w-full xl:w-auto bg-slate-900/50 p-1 rounded-lg">
+                    <button onclick="setDesign('glass')" id="btn-glass" class="flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow">
+                        <i class="fa-regular fa-gem mr-1"></i> Glass
+                    </button>
+                    <button onclick="setDesign('paper')" id="btn-paper" class="flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white">
+                        <i class="fa-regular fa-file-lines mr-1"></i> Paper
+                    </button>
+                    <button onclick="setDesign('cyber')" id="btn-cyber" class="flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-microchip mr-1"></i> Cyber
+                    </button>
+                </div>
+
+                <!-- Download -->
+                <button onclick="downloadImage()" class="w-full xl:w-auto bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-download"></i> Save Image
+                </button>
+            </div>
+        </div>
+
+        <!-- Output Grid (The part that gets saved) -->
+        <div id="scheduleContainer" class="p-4 rounded-2xl bg-[#030712] relative transition-colors duration-500">
+            <div id="resultArea" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 pb-8">
+                <!-- Columns injected by JS -->
             </div>
 
-            <!-- TTH -->
-            <div class="space-y-4 animate-fade-up" style="animation-delay: 0.3s;">
-                <div class="flex items-center gap-3 pb-2 border-b border-white/5">
-                    <div class="w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]"></div>
-                    <h2 class="font-bold text-xl text-slate-200">Tue / Thu</h2>
-                    <span id="cnt-tth" class="ml-auto text-xs font-mono text-amber-400 bg-amber-400/10 px-2 py-1 rounded">0</span>
-                </div>
-                <div id="list-tth" class="space-y-4"></div>
-            </div>
-
-            <!-- SAT -->
-            <div class="space-y-4 animate-fade-up" style="animation-delay: 0.4s;">
-                <div class="flex items-center gap-3 pb-2 border-b border-white/5">
-                    <div class="w-3 h-3 rounded-full bg-pink-400 shadow-[0_0_10px_#f472b6]"></div>
-                    <h2 class="font-bold text-xl text-slate-200">Saturday</h2>
-                    <span id="cnt-sat" class="ml-auto text-xs font-mono text-pink-400 bg-pink-400/10 px-2 py-1 rounded">0</span>
-                </div>
-                <div id="list-sat" class="space-y-4"></div>
+            <!-- WATERMARK -->
+            <div id="watermark" class="hidden text-center pt-6 border-t border-slate-800/50 mt-4">
+                <p class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
+                    <i class="fa-solid fa-microchip mr-1"></i> Powered by CMOB Department
+                </p>
             </div>
         </div>
 
@@ -171,180 +196,196 @@
 
     </main>
 
-    <!-- NEW: DUAL TAB VIDEO MODAL -->
+
+
+
+
+
+ <!-- NEW: FLOATING CUSTOMIZE BUTTON -->
+    <button id="fabCustomize" onclick="openTemplateModal()" class="hidden fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-2xl z-50 flex items-center justify-center text-xl transition hover:scale-110 active:scale-90 animate-bounce">
+        <i class="fa-solid fa-palette"></i>
+    </button>
+
+    <!-- NEW: TEMPLATE GALLERY MODAL -->
+    <div id="templateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+        <div class="absolute inset-0" onclick="closeTemplateModal()"></div>
+        <div class="glass w-full max-w-4xl h-[80vh] rounded-2xl flex flex-col relative z-10">
+            <div class="p-5 border-b border-white/10 flex justify-between items-center">
+                <h3 class="font-bold text-xl text-white">Select a Design Style</h3>
+                <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Cosmic (Default) -->
+                <div onclick="applyTemplate('cosmic')" class="cursor-pointer group">
+                    <div class="bg-[#030712] border border-blue-500/50 h-32 rounded-xl relative overflow-hidden mb-2 group-hover:ring-2 ring-blue-500 transition"><div class="absolute inset-0 flex items-center justify-center font-bold text-white">Cosmic Glass</div></div>
+                    <p class="text-xs text-center text-slate-400">Default Dark Mode</p>
+                </div>
+                <!-- Paper -->
+                <div onclick="applyTemplate('paper')" class="cursor-pointer group">
+                    <div class="bg-white border border-gray-300 h-32 rounded-xl relative overflow-hidden mb-2 group-hover:ring-2 ring-gray-400 transition shadow-lg"><div class="absolute inset-0 flex items-center justify-center font-bold text-gray-800">Clean Paper</div></div>
+                    <p class="text-xs text-center text-slate-400">Minimalist Light</p>
+                </div>
+                <!-- Cyberpunk -->
+                <div onclick="applyTemplate('cyber')" class="cursor-pointer group">
+                    <div class="bg-black border-2 border-green-500 h-32 rounded-none relative overflow-hidden mb-2 group-hover:shadow-[0_0_15px_#22c55e] transition"><div class="absolute inset-0 flex items-center justify-center font-bold text-green-500 font-mono">CYBERPUNK</div></div>
+                    <p class="text-xs text-center text-slate-400">High Contrast Neon</p>
+                </div>
+                <!-- Notebook -->
+                <div onclick="applyTemplate('notebook')" class="cursor-pointer group">
+                    <div class="bg-[#fef9c3] border border-yellow-600 h-32 rounded-sm relative overflow-hidden mb-2 group-hover:rotate-1 transition"><div class="absolute inset-0 flex items-center justify-center font-bold text-slate-700 font-serif">Sketchbook</div></div>
+                    <p class="text-xs text-center text-slate-400">Handwritten Style</p>
+                </div>
+                <!-- Blueprint -->
+                <div onclick="applyTemplate('blueprint')" class="cursor-pointer group">
+                    <div class="bg-[#1e3a8a] border border-blue-300/30 h-32 rounded-sm relative overflow-hidden mb-2" style="background-image: radial-gradient(#60a5fa 1px, transparent 1px); background-size: 10px 10px;"><div class="absolute inset-0 flex items-center justify-center font-bold text-blue-100 font-mono">Blueprint</div></div>
+                    <p class="text-xs text-center text-slate-400">Technical Grid</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/50 py-8 bg-[#020617] relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-sm font-medium">
+                Powered by 
+                <span class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                    <i class="fa-solid fa-microchip mr-1"></i> CMOB Department
+                </span>
+            </p>
+            <p class="text-[10px] text-slate-600 mt-2 font-mono">&copy; 2026. Built for UC Students.</p>
+        </div>
+    </footer>
+
+    <!-- VIDEO MODAL -->
     <div id="videoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-opacity duration-300">
         <div class="absolute inset-0" onclick="toggleVideo()"></div>
-        <div class="glass-panel w-full max-w-4xl rounded-2xl overflow-hidden relative z-10 transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
-            
-            <!-- Modal Header -->
+        <div class="glass-panel w-full max-w-4xl rounded-2xl overflow-hidden relative z-10">
             <div class="flex justify-between items-center p-5 border-b border-white/10 bg-white/5">
-                <h3 class="font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-play-circle text-blue-500"></i> How to Use
-                </h3>
-                <button onclick="toggleVideo()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <h3 class="font-bold text-white">How to Use</h3>
+                <button onclick="toggleVideo()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
-            <!-- TABS -->
             <div class="flex p-2 bg-slate-900/50 gap-2 border-b border-white/5">
-                <button onclick="switchTab('mobile')" id="btn-mobile" class="glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg text-center transition-all">
-                    <i class="fa-solid fa-mobile-screen mr-2"></i> Mobile
-                </button>
-                <button onclick="switchTab('desktop')" id="btn-desktop" class="glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg text-center transition-all">
-                    <i class="fa-solid fa-desktop mr-2"></i> Desktop
-                </button>
+                <button onclick="switchTab('mobile')" id="btn-mobile" class="glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg">Mobile</button>
+                <button onclick="switchTab('desktop')" id="btn-desktop" class="glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg">Desktop</button>
             </div>
-
-            <!-- VIDEO CONTAINER -->
             <div class="p-4 bg-black/40">
-                
-                <!-- MOBILE VIEW -->
                 <div id="view-mobile">
                     <div class="aspect-video bg-black rounded-lg overflow-hidden border border-slate-700 mb-3 relative">
                         <video id="vid-mobile" class="w-full h-full object-contain" controls playsinline>
-                            <!-- MOBILE VIDEO FILE -->
                             <source src="mon.mp4" type="video/mp4">
-                            <p class="text-slate-500 text-sm flex items-center justify-center h-full">File 'mobile_tutorial.mp4' not found.</p>
                         </video>
                     </div>
-                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Open PDF > Select All > Copy > Paste Here.</p>
+                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Open PDF > Copy Text > Paste Here.</p>
                 </div>
-
-                <!-- DESKTOP VIEW (Hidden) -->
                 <div id="view-desktop" class="hidden">
                     <div class="aspect-video bg-black rounded-lg overflow-hidden border border-slate-700 mb-3 relative">
                         <video id="vid-desktop" class="w-full h-full object-contain" controls playsinline>
-                            <!-- DESKTOP VIDEO FILE -->
                             <source src="2026-01-20 12-21-41.mp4" type="video/mp4">
-                            <p class="text-slate-500 text-sm flex items-center justify-center h-full">File 'desktop_tutorial.mp4' not found.</p>
                         </video>
                     </div>
-                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Portal > Ctrl+A > Ctrl+C > Paste Here.</p>
+                    <p class="text-xs text-slate-400 text-center font-mono">Tip: Portal > Copy (Ctrl+C) > Paste (Ctrl+V).</p>
                 </div>
-
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const REMOTE_DB_URL = ""; 
+        // GLOBAL STATE
+        let currentTemplate = 'cosmic';
+        let parsedData = { mwf: [], tth: [], sat: [] };
+        let currentDesign = 'glass'; // glass, paper, cyber
+        let currentColor = 'emerald'; // Default
 
-        // --- 1. SYSTEM INIT ---
+        // THEMES
+        const themes = {
+            BSIT: { primary: '#3b82f6', secondary: '#a855f7', button: 'bg-blue-600' },
+            MARITIME: { primary: '#0ea5e9', secondary: '#1e3a8a', button: 'bg-sky-600' },
+            ENGINEERING: { primary: '#f97316', secondary: '#dc2626', button: 'bg-orange-600' },
+            CUSTOMS: { primary: '#10b981', secondary: '#0f766e', button: 'bg-emerald-600' },
+            EDUCATION: { primary: '#ec4899', secondary: '#be123c', button: 'bg-pink-600' }
+        };
+
+        // --- INIT ---
         window.onload = function() {
             const savedData = localStorage.getItem('uc_schedule_data');
+            const savedTheme = localStorage.getItem('uc_theme') || 'BSIT';
+            document.getElementById('deptSelect').value = savedTheme;
+            changeTheme(savedTheme);
             if(savedData) {
                 document.getElementById('rawInput').value = savedData;
                 processSchedule();
             }
-            if(REMOTE_DB_URL) checkRemoteUpdates();
         }
 
-        async function checkRemoteUpdates() {
-            try {
-                const response = await fetch(REMOTE_DB_URL);
-                const data = await response.json();
-                if (data.show_announcement) {
-                    const bar = document.getElementById('news-bar');
-                    document.getElementById('news-text').innerText = data.announcement;
-                    bar.classList.remove('hidden');
-                    if(data.color === 'red') {
-                        bar.classList.remove('bg-blue-600');
-                        bar.classList.add('bg-red-600');
-                    }
-                }
-            } catch (e) { console.log("No updates found"); }
+        // --- THEME ENGINE ---
+        function changeTheme(dept) {
+            const theme = themes[dept];
+            const root = document.documentElement;
+            localStorage.setItem('uc_theme', dept);
+            root.style.setProperty('--theme-primary', theme.primary);
+            root.style.setProperty('--theme-secondary', theme.secondary);
+            const btn = document.getElementById('genBtn');
+            btn.className = btn.className.replace(/bg-\w+-600/g, ''); 
+            btn.classList.add(theme.button);
         }
 
-        // --- 2. VIDEO TAB LOGIC ---
-        function switchTab(mode) {
-            const mobileView = document.getElementById('view-mobile');
-            const desktopView = document.getElementById('view-desktop');
-            const mobileBtn = document.getElementById('btn-mobile');
-            const desktopBtn = document.getElementById('btn-desktop');
+        // --- DESIGN ENGINE (The New Feature) ---
+        function setDesign(design) {
+            currentDesign = design;
             
-            // Pause videos
-            document.getElementById('vid-mobile').pause();
-            document.getElementById('vid-desktop').pause();
+            // Update Buttons
+            ['glass', 'paper', 'cyber'].forEach(d => {
+                const btn = document.getElementById(`btn-${d}`);
+                if(d === design) {
+                    btn.classList.add('bg-blue-600', 'text-white', 'shadow');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow');
+                    btn.classList.add('text-slate-400');
+                }
+            });
 
-            if (mode === 'mobile') {
-                mobileView.classList.remove('hidden');
-                desktopView.classList.add('hidden');
-                
-                mobileBtn.classList.add('tab-active');
-                mobileBtn.classList.remove('tab-inactive');
-                
-                desktopBtn.classList.remove('tab-active');
-                desktopBtn.classList.add('tab-inactive');
-            } else {
-                desktopView.classList.remove('hidden');
-                mobileView.classList.add('hidden');
+            // Update Container BG
+            const container = document.getElementById('scheduleContainer');
+            if(design === 'paper') container.style.backgroundColor = '#f8fafc'; // White-ish
+            else if(design === 'cyber') container.style.backgroundColor = '#000000'; // Pure Black
+            else container.style.backgroundColor = '#030712'; // Default Dark
 
-                desktopBtn.classList.add('tab-active');
-                desktopBtn.classList.remove('tab-inactive');
-
-                mobileBtn.classList.remove('tab-active');
-                mobileBtn.classList.add('tab-inactive');
-            }
+            renderAll();
         }
 
-        function toggleVideo() {
-            const modal = document.getElementById('videoModal');
-            const content = document.getElementById('modalContent');
-
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            } else {
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
-                // Pause All
-                document.getElementById('vid-mobile').pause();
-                document.getElementById('vid-desktop').pause();
-                setTimeout(() => { modal.classList.add('hidden'); }, 300);
-            }
-        }
-
-        // --- 3. DATA MANAGEMENT ---
-        function clearData() {
-            if(confirm("Clear your saved schedule?")) {
-                localStorage.removeItem('uc_schedule_data');
-                document.getElementById('rawInput').value = '';
-                location.reload();
-            }
-        }
-
-        // --- 4. THE SCANNER ENGINE ---
+        // --- PARSER ---
         function processSchedule() {
             const raw = document.getElementById('rawInput').value;
-            if(!raw.trim()) {
-                const box = document.querySelector('textarea').parentElement;
-                box.classList.add('animate-pulse');
-                setTimeout(() => box.classList.remove('animate-pulse'), 500);
-                return;
-            }
-
-            // Auto-Save
+            if(!raw.trim()) return;
             localStorage.setItem('uc_schedule_data', raw);
 
-            const data = { mwf: [], tth: [], sat: [] };
+            // Reset Data
+            parsedData = { mwf: [], tth: [], sat: [] };
             const lines = raw.split('\n');
             
             lines.forEach(line => {
                 let cleanLine = line.replace(/\t/g, ' ').trim();
-                
-                // STRICT FILTER: 5 Digits EDP
                 const edpMatch = cleanLine.match(/^(\d{5})/);
                 if (!edpMatch) return; 
                 const edpCode = edpMatch[1];
-
                 const timeRegex = /(\d{1,2}:\d{2}\s?[AP]M)\s?[-–]\s?(\d{1,2}:\d{2}\s?[AP]M)/i;
                 const dayRegex = /(MWF|MW|TTH|SAT|FRI|TUE|THU)/i;
-                
                 const timeMatch = cleanLine.match(timeRegex);
                 const dayMatch = cleanLine.match(dayRegex);
 
@@ -352,104 +393,219 @@
                     const fullTime = timeMatch[0];
                     const startTime = timeMatch[1];
                     const day = dayMatch[0].toUpperCase();
-                    
-                    let middlePart = cleanLine.replace(edpCode, '').split(dayMatch[0])[0].trim();
-                    let parts = middlePart.split(/\s+/);
-                    
-                    if(parts.length > 0 && /^\d$/.test(parts[parts.length-1])) parts.pop();
-
-                    let lastWord = parts[parts.length-1];
+                    let middlePart = cleanLine.replace(edpCode, '').split(dayMatch[0])[0].trim().split(/\s+/);
+                    if(middlePart.length > 0 && /^\d$/.test(middlePart[middlePart.length-1])) middlePart.pop();
+                    let lastWord = middlePart[middlePart.length-1];
                     let type = "LEC"; 
                     if(lastWord && ['LAB','LEC','L'].includes(lastWord)) {
                         type = lastWord === 'L' ? 'LAB' : lastWord;
-                        parts.pop();
+                        middlePart.pop();
                     }
-                    const subject = parts.join(" ");
-
+                    const subject = middlePart.join(" ");
                     const afterTime = cleanLine.split(fullTime)[1] || "";
                     let room = afterTime.trim().split(/\s{2,}/)[0] || afterTime.trim().split(/\s+/)[0] || "TBA";
                     room = room.replace(/[^a-zA-Z0-9-]/g, '');
 
                     const item = {
-                        edp: edpCode,
-                        subject: subject,
-                        time: fullTime,
-                        room: room,
-                        sort: parseTime(startTime),
-                        type: type
+                        edp: edpCode, subject, time: fullTime, room, type,
+                        sort: parseTime(startTime)
                     };
 
-                    if(day.includes("SAT")) data.sat.push(item);
-                    else if(day.includes("T") || day.includes("H")) data.tth.push(item);
-                    else data.mwf.push(item);
+                    if(day.includes("SAT")) parsedData.sat.push(item);
+                    else if(day.includes("T") || day.includes("H")) parsedData.tth.push(item);
+                    else parsedData.mwf.push(item);
                 }
             });
 
-            // SORTING
+            // Sort
             const sorter = (a, b) => a.sort - b.sort;
-            data.mwf.sort(sorter);
-            data.tth.sort(sorter);
-            data.sat.sort(sorter);
+            parsedData.mwf.sort(sorter); parsedData.tth.sort(sorter); parsedData.sat.sort(sorter);
 
+            // Show UI
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('resultArea').classList.remove('hidden');
-
-            renderColumn('list-mwf', 'cnt-mwf', data.mwf, 'emerald');
-            renderColumn('list-tth', 'cnt-tth', data.tth, 'amber');
-            renderColumn('list-sat', 'cnt-sat', data.sat, 'pink');
+            document.getElementById('toolbar').classList.remove('hidden');
+            document.getElementById('fabCustomize').classList.remove('hidden');
+            renderAll();
         }
 
-        function renderColumn(listId, countId, items, colorName) {
-            const list = document.getElementById(listId);
-            const count = document.getElementById(countId);
-            list.innerHTML = '';
-            count.innerText = items.length;
+       // --- RENDER ENGINE (Supports 5 Designs) ---
+        function renderAll() {
+            const container = document.getElementById('resultArea');
+            container.innerHTML = ''; // Clear current schedule
 
-            if(items.length === 0) {
-                list.innerHTML = `<div class="p-4 border border-dashed border-white/10 rounded-xl text-center text-slate-500 text-xs italic">No classes</div>`;
-                return;
-            }
+            const days = [
+                { id: 'mwf', title: 'Mon / Wed / Fri', data: parsedData.mwf, color: 'emerald' },
+                { id: 'tth', title: 'Tue / Thu', data: parsedData.tth, color: 'amber' },
+                { id: 'sat', title: 'Saturday', data: parsedData.sat, color: 'pink' }
+            ];
 
-            items.forEach((c, index) => {
-                const delay = index * 100;
+            days.forEach(dayGroup => {
+                const col = document.createElement('div');
+                col.className = 'space-y-4 animate-fade-up';
                 
-                const card = `
-                <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 animate-fade-up" style="animation-delay: ${delay}ms; animation-fill-mode: backwards;">
-                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-${colorName}-400"></div>
-                    
-                    <div class="pl-2">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="inline-block bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.5)] text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded mb-1 tracking-widest">
-                                    ${c.edp}
-                                </div>
-                                <h3 class="font-bold text-lg leading-tight text-white group-hover:text-${colorName}-300 transition-colors">${c.subject}</h3>
-                            </div>
-                            <span class="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">${c.type}</span>
-                        </div>
+                // 1. GENERATE HEADER BASED ON DESIGN
+                let headerHTML = '';
+                
+                if(currentTemplate === 'paper') {
+                    headerHTML = `
+                    <div class="flex items-center gap-2 border-b-2 border-gray-300 pb-2 mb-4">
+                        <h2 class="font-extrabold text-xl text-gray-800 uppercase tracking-tighter">${dayGroup.title}</h2>
+                        <span class="ml-auto text-xs font-bold bg-gray-200 text-gray-600 px-2 py-1 rounded-md">${dayGroup.data.length} Classes</span>
+                    </div>`;
+                } else if (currentTemplate === 'cyber') {
+                    headerHTML = `
+                    <div class="flex items-center gap-2 border-b border-${dayGroup.color}-500 pb-2 mb-4">
+                        <i class="fa-solid fa-microchip text-${dayGroup.color}-500"></i>
+                        <h2 class="font-mono text-lg text-${dayGroup.color}-400 uppercase tracking-widest">${dayGroup.title}</h2>
+                    </div>`;
+                } else if (currentTemplate === 'notebook') {
+                    headerHTML = `
+                    <div class="mb-4">
+                        <h2 class="font-hand text-2xl text-slate-700 font-bold decoration-wavy underline decoration-red-400">${dayGroup.title}</h2>
+                    </div>`;
+                } else if (currentTemplate === 'blueprint') {
+                    headerHTML = `
+                    <div class="mb-4 border-b-2 border-white/30 pb-1">
+                        <h2 class="font-mono text-lg text-blue-100 uppercase tracking-widest">[ ${dayGroup.title} ]</h2>
+                    </div>`;
+                } else { // Cosmic (Default)
+                    headerHTML = `
+                    <div class="flex items-center gap-3 pb-2 border-b border-white/10 mb-4">
+                        <div class="w-3 h-3 rounded-full bg-${dayGroup.color}-400 shadow-[0_0_10px_currentColor]"></div>
+                        <h2 class="font-bold text-xl text-slate-200">${dayGroup.title}</h2>
+                        <span class="ml-auto text-xs font-mono bg-${dayGroup.color}-400/10 text-${dayGroup.color}-400 px-2 py-1 rounded">${dayGroup.data.length}</span>
+                    </div>`;
+                }
+                col.innerHTML = headerHTML;
 
-                        <div class="flex items-center gap-2 text-sm text-${colorName}-300 mb-1">
-                            <i class="fa-regular fa-clock"></i>
-                            <span class="font-medium">${c.time}</span>
-                        </div>
-                        
-                        <div class="flex items-center gap-2 text-xs text-slate-400">
-                            <i class="fa-solid fa-location-dot text-slate-500"></i>
-                            <span class="font-mono">${c.room}</span>
-                        </div>
-                    </div>
-                </div>`;
-                list.innerHTML += card;
+                // 2. GENERATE CARDS BASED ON DESIGN
+                if(dayGroup.data.length === 0) {
+                    const textColor = currentTemplate === 'paper' || currentTemplate === 'notebook' ? 'text-gray-400' : 'text-slate-600';
+                    col.innerHTML += `<div class="text-center text-xs opacity-50 py-4 ${textColor} italic">No classes</div>`;
+                } else {
+                    dayGroup.data.forEach(c => {
+                        let card = '';
+
+                        // A. COSMIC GLASS
+                        if(currentTemplate === 'cosmic') {
+                            card = `
+                            <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-${dayGroup.color}-400"></div>
+                                <div class="pl-2">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span class="font-mono text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">${c.edp}</span>
+                                            <h4 class="font-bold text-white text-sm mt-1">${c.subject}</h4>
+                                        </div>
+                                        <span class="text-[10px] font-bold border border-slate-600 text-slate-400 px-1.5 py-0.5 rounded">${c.type}</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-xs text-slate-300">
+                                        <span class="text-${dayGroup.color}-300"><i class="fa-regular fa-clock"></i> ${c.time}</span>
+                                        <span><i class="fa-solid fa-location-dot text-slate-500"></i> ${c.room}</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } 
+                        // B. CLEAN PAPER
+                        else if(currentTemplate === 'paper') {
+                            card = `
+                            <div class="bg-white border-l-4 border-${dayGroup.color}-500 shadow-sm p-4 rounded-lg hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-extrabold text-gray-800 text-sm uppercase">${c.subject}</h4>
+                                    <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">${c.type}</span>
+                                </div>
+                                <div class="mt-2 flex items-center justify-between text-xs text-gray-600 font-mono">
+                                    <span class="font-bold"><i class="fa-regular fa-clock"></i> ${c.time}</span>
+                                    <span class="bg-gray-100 px-2 rounded">${c.room}</span>
+                                </div>
+                                <div class="mt-1 text-[10px] text-gray-400 font-bold">#${c.edp}</div>
+                            </div>`;
+                        }
+                        // C. CYBERPUNK
+                        else if(currentTemplate === 'cyber') {
+                            card = `
+                            <div class="bg-black border border-${dayGroup.color}-500/50 p-4 relative overflow-hidden group hover:bg-${dayGroup.color}-900/10 transition">
+                                <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-${dayGroup.color}-500"></div>
+                                <div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-${dayGroup.color}-500"></div>
+                                
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-mono text-[10px] text-${dayGroup.color}-400">[${c.edp}]</span>
+                                    <span class="text-[9px] text-black bg-${dayGroup.color}-400 px-1 font-bold">${c.type}</span>
+                                </div>
+                                <h4 class="font-bold text-white text-sm tracking-wider mb-2 font-cyber">${c.subject}</h4>
+                                <div class="text-xs text-gray-400 font-mono">
+                                    <div>> T: ${c.time}</div>
+                                    <div>> R: ${c.room}</div>
+                                </div>
+                            </div>`;
+                        }
+                        // D. NOTEBOOK
+                        else if(currentTemplate === 'notebook') {
+                            card = `
+                            <div class="bg-white/90 p-3 shadow-md rounded-sm border border-slate-200 rotate-1 hover:rotate-0 transition duration-300 relative">
+                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-red-400/20 rounded-full blur-sm"></div>
+                                <h4 class="font-bold text-slate-700 font-hand text-lg leading-tight">${c.subject}</h4>
+                                <div class="flex justify-between items-center mt-2 border-t border-slate-300 pt-1">
+                                    <span class="text-xs text-slate-600 font-hand font-bold">${c.time}</span>
+                                    <span class="text-[10px] font-mono text-slate-400 bg-yellow-100 px-1">${c.room}</span>
+                                </div>
+                            </div>`;
+                        }
+                        // E. BLUEPRINT
+                        else if(currentTemplate === 'blueprint') {
+                            card = `
+                            <div class="border-2 border-white/50 p-3 bg-blue-900/40 hover:bg-blue-900/60 transition">
+                                <div class="flex justify-between border-b border-white/20 pb-1 mb-2">
+                                    <span class="text-[10px] font-mono text-blue-200">ID: ${c.edp}</span>
+                                    <span class="text-[10px] font-mono text-white">[${c.type}]</span>
+                                </div>
+                                <h4 class="font-bold text-white font-mono text-sm mb-2">${c.subject}</h4>
+                                <div class="grid grid-cols-2 text-[10px] text-blue-100 font-mono">
+                                    <div>T: ${c.time}</div>
+                                    <div class="text-right">R: ${c.room}</div>
+                                </div>
+                            </div>`;
+                        }
+
+                        col.innerHTML += card;
+                    });
+                }
+                container.appendChild(col);
             });
         }
 
+        // --- UTILS ---
         function parseTime(t) {
-            let [time, mod] = t.split(/\s+/);
-            if(!mod) { mod = t.includes('PM') ? 'PM' : 'AM'; time = t.replace(/[AP]M/,''); }
-            let [h, m] = time.split(':').map(Number);
-            if(h === 12) h = 0;
-            if(mod.toUpperCase() === 'PM') h += 12;
+            let [time, mod] = t.split(/([AP]M)/i);
+            let [h, m] = time.trim().split(':').map(Number);
+            if(h === 12) h = 0; if(mod.toUpperCase() === 'PM') h += 12;
             return h * 60 + m;
+        }
+
+        function downloadImage() {
+            const element = document.getElementById('scheduleContainer');
+            document.getElementById('watermark').classList.remove('hidden');
+            
+            // Adjust watermark color for paper mode
+            if(currentDesign === 'paper') document.querySelector('#watermark p').className = "text-[10px] text-gray-400 font-mono uppercase tracking-widest";
+            else document.querySelector('#watermark p').className = "text-[10px] text-slate-600 font-mono uppercase tracking-widest";
+
+            const btn = document.querySelector('#toolbar button:last-child');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Saving...`;
+
+            html2canvas(element, {
+                backgroundColor: currentDesign === 'paper' ? '#f8fafc' : (currentDesign === 'cyber' ? '#000000' : '#030712'),
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `UC_Schedule_${currentDesign}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                btn.innerHTML = originalText;
+                document.getElementById('watermark').classList.add('hidden');
+            });
         }
 
         function loadExample() {
@@ -460,6 +616,143 @@
 17128 IT-SYSADMN32 LAB 1 MWF 11:30 AM - 12:30 PM C1 BSIT`;
             document.getElementById('rawInput').value = ex;
         }
+
+        function switchTab(mode) {
+            const mobileView = document.getElementById('view-mobile');
+            const desktopView = document.getElementById('view-desktop');
+            const mobileBtn = document.getElementById('btn-mobile');
+            const desktopBtn = document.getElementById('btn-desktop');
+            document.getElementById('vid-mobile').pause();
+            document.getElementById('vid-desktop').pause();
+
+            if (mode === 'mobile') {
+                mobileView.classList.remove('hidden'); desktopView.classList.add('hidden');
+                mobileBtn.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+                desktopBtn.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+            } else {
+                desktopView.classList.remove('hidden'); mobileView.classList.add('hidden');
+                desktopBtn.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+                mobileBtn.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+            }
+        }
+
+       function toggleVideo() {
+    const modal = document.getElementById('videoModal');
+    // Try to find the inner content for animation, but don't crash if missing
+    const content = document.getElementById('modalContent'); 
+
+    // 1. If the main modal container is missing, we can't do anything.
+    if (!modal) {
+        console.error("Error: ID 'videoModal' not found in HTML.");
+        return;
+    }
+
+    if (modal.classList.contains('hidden')) {
+        // --- OPENING ---
+        modal.classList.remove('hidden');
+        
+        // Only animate if the inner box exists
+        if (content) {
+            setTimeout(() => { 
+                content.classList.remove('scale-95', 'opacity-0'); 
+                content.classList.add('scale-100', 'opacity-100'); 
+            }, 10);
+        }
+    } else {
+        // --- CLOSING ---
+        
+        // 1. Animate out if possible
+        if (content) {
+            content.classList.remove('scale-100', 'opacity-100'); 
+            content.classList.add('scale-95', 'opacity-0');
+        }
+        
+        // 2. Safe Video Pause (Checks if elements exist before pausing)
+        const vidMob = document.getElementById('vid-mobile');
+        const vidDesk = document.getElementById('vid-desktop');
+        if (vidMob) vidMob.pause();
+        if (vidDesk) vidDesk.pause();
+
+        // 3. Hide the modal after a short delay
+        setTimeout(() => { 
+            modal.classList.add('hidden'); 
+        }, 300);
+    }
+}
+
+        function clearData() {
+            if(confirm("Clear your saved schedule?")) {
+                localStorage.removeItem('uc_schedule_data');
+                document.getElementById('rawInput').value = '';
+                location.reload();
+            }
+        }
+
+
+
+
+
+
+
+        // --- NEW DESIGN ENGINE ---
+function openTemplateModal() { document.getElementById('templateModal').classList.remove('hidden'); }
+function closeTemplateModal() { document.getElementById('templateModal').classList.add('hidden'); }
+
+function applyTemplate(style) {
+    currentTemplate = style;
+    closeTemplateModal();
+    // Re-render the cards with the new design
+    renderAll(); 
+    updateContainerStyle(style);
+}
+
+function updateContainerStyle(style) {
+    const container = document.getElementById('scheduleContainer');
+    const title = document.getElementById('schedTitle');
+    const bgDecor = document.getElementById('bgDecor');
+    const watermark = document.getElementById('watermark');
+
+    // Reset Defaults
+    container.style = ""; 
+    title.className = "text-2xl font-bold tracking-tight text-white";
+    bgDecor.style.display = 'block';
+
+    if (style === 'paper') {
+        container.style.backgroundColor = '#ffffff';
+        container.style.border = '1px solid #e2e8f0';
+        title.className = "text-2xl font-extrabold text-slate-800 uppercase tracking-tight";
+        bgDecor.style.display = 'none';
+        watermark.className = "hidden text-center pt-6 border-t border-gray-200 mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest";
+    } else if (style === 'cyber') {
+        container.style.backgroundColor = '#000000';
+        container.style.border = '2px solid #22c55e';
+        title.className = "text-2xl font-bold text-green-500 font-mono tracking-widest uppercase";
+        bgDecor.style.display = 'none';
+        watermark.className = "hidden text-center pt-6 border-t border-green-900 mt-4 text-[10px] text-green-500 font-mono uppercase";
+    } else if (style === 'notebook') {
+        container.style.backgroundColor = '#fef9c3';
+        container.style.backgroundImage = 'linear-gradient(#e5e7eb 1px, transparent 1px)';
+        container.style.backgroundSize = '20px 20px';
+        title.className = "text-3xl font-bold text-slate-700 font-serif rotate-[-2deg]";
+        bgDecor.style.display = 'none';
+        watermark.className = "hidden text-center pt-6 border-t border-slate-300 mt-4 text-[10px] text-slate-500 font-serif";
+    } else if (style === 'blueprint') {
+        container.style.backgroundColor = '#172554';
+        container.style.backgroundImage = 'radial-gradient(#3b82f6 1px, transparent 1px)';
+        container.style.backgroundSize = '20px 20px';
+        container.style.border = '4px solid white';
+        title.className = "text-2xl font-bold text-white font-mono uppercase border-b-2 border-white inline-block";
+        bgDecor.style.display = 'none';
+        watermark.className = "hidden text-center pt-6 border-t border-blue-400/30 mt-4 text-[10px] text-blue-200 font-mono uppercase";
+    } else {
+        // Cosmic (Default)
+        container.style.backgroundColor = '#030712';
+        watermark.className = "hidden text-center pt-6 border-t border-dashed border-white/10 mt-4 text-[10px] text-slate-500 font-mono uppercase tracking-widest";
+    }
+    
+    // Show watermark
+    watermark.classList.remove('hidden');
+}
     </script>
 </body>
 </html>
