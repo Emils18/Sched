@@ -13,6 +13,15 @@
     <!-- Fonts -->
  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Gloria+Hallelujah&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
+
+<!-- PDF.js (Matched Versions) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+
+
     <script>
 
 
@@ -96,6 +105,23 @@
                 <p class="text-slate-400 font-light text-lg">Paste text. Choose design. Save image.</p>
             </div>
             
+<!-- PDF UPLOAD BUTTON -->
+
+           
+      <div class="flex flex-col items-center">
+    <!-- THE NEW TEXT -->
+    <span class="text-[10px] font-bold text-blue-400 uppercase tracking-[0.2em] mb-1 animate-pulse">
+        BETA Test
+    </span>
+
+    <label class="cursor-pointer glass-btn px-5 py-3 rounded-full flex items-center gap-2 group">
+        <i class="fa-solid fa-file-pdf text-red-500"></i>
+        <span id="pdfLabel" class="text-sm font-semibold tracking-wide text-slate-300 group-hover:text-white">Upload PDF</span>
+        <input type="file" id="pdfUpload" accept=".pdf" class="hidden" onchange="handlePDF(this)">
+    </label>
+</div>
+
+
             <div class="flex gap-3">
                 <button onclick="toggleVideo()" class="glass-btn px-5 py-3 rounded-full flex items-center gap-2 group">
                     <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
@@ -311,6 +337,84 @@
         let currentDesign = 'glass'; // glass, paper, cyber
         let currentColor = 'emerald'; // Default
 
+
+
+        
+  // --- 1. COORDINATE-SORTED PDF READER (WITH SMART WELDING) ---
+        async function handlePDF(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const labelSpan = document.getElementById('pdfLabel');
+            const originalContent = labelSpan.innerHTML;
+            labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Reading PDF...`;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let fullText = "";
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    
+                    let items = textContent.items.sort((a, b) => {
+                        if (Math.abs(a.transform[5] - b.transform[5]) > 4) return b.transform[5] - a.transform[5];
+                        return a.transform[4] - b.transform[4];
+                    });
+
+                    let lastY = -1;
+                    let lastX = -1;
+                    for (let item of items) {
+                        let currentX = item.transform[4];
+                        let currentY = item.transform[5];
+
+                        if (lastY !== -1 && Math.abs(currentY - lastY) > 4) {
+                            fullText += "\n";
+                        } 
+                        else if (lastX !== -1 && (currentX - lastX) > 6) { 
+                            fullText += " "; 
+                        }
+
+                        fullText += item.str;
+                        lastY = currentY;
+                        lastX = currentX + (item.width || 0);
+                    }
+                }
+
+                // 1. Put text in the box
+                document.getElementById('rawInput').value = fullText;
+                
+                // 2. Feedback only - Removed processSchedule() so it waits for click
+                labelSpan.innerHTML = `<i class="fa-solid fa-check"></i> Ready to Generate!`;
+                
+                setTimeout(() => {
+                    labelSpan.innerHTML = originalContent;
+                    input.value = ''; 
+                }, 3000);
+
+            } catch (error) {
+                alert("PDF Error: " + error.message);
+                labelSpan.innerHTML = originalContent;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // THEMES
         const themes = {
             BSIT: { primary: '#3b82f6', secondary: '#a855f7', button: 'bg-blue-600' },
@@ -369,65 +473,170 @@
             renderAll();
         }
 
-        // --- PARSER ---
-        function processSchedule() {
-            const raw = document.getElementById('rawInput').value;
-            if(!raw.trim()) return;
-            localStorage.setItem('uc_schedule_data', raw);
+// --- 2. THE UNIFIED FUZZY PROCESSOR ---
+function processSchedule() {
+    const raw = document.getElementById('rawInput').value;
+    if (!raw.trim()) return;
 
-            // Reset Data
-            parsedData = { mwf: [], tth: [], sat: [] };
-            const lines = raw.split('\n');
+    localStorage.setItem('uc_schedule_data', raw);
+    parsedData = { mwf: [], tth: [], sat: [] };
+    
+    // 1. Get Student Name (Header Logic)
+    const nameMatch = raw.match(/Name\s*[:\s]*([^(\n|]+)/i);
+    if (nameMatch) {
+        studentName = nameMatch[1].replace(/Name/gi, '').trim().split('(')[0].trim();
+    }
+
+    const lines = raw.split('\n');
+    let foundCount = 0;
+
+    lines.forEach(line => {
+        // Clean line noise and standardize dashes
+        const cleanLine = line.replace(/[–—]/g, '-').trim();
+
+        // ANCHORS: We need an EDP (5 digits) and a Time (00:00 AM - 00:00 PM)
+        const edpMatch = cleanLine.match(/\b\d{5}\b/);
+        const timeMatch = cleanLine.match(/(\d{1,2}:\d{2}\s*[AP]M\s*-\s*\d{1,2}:\d{2}\s*[AP]M)/i);
+
+        if (edpMatch && timeMatch) {
+            const edp = edpMatch[0];
+            const time = timeMatch[0].toUpperCase();
+
+            // Find Day Pattern
+            const dayMatch = cleanLine.match(/\b(MWF|TTH|SAT|MW|TUE|THU|FRI|S|M|W|F|T|TH)\b/i);
+            const days = dayMatch ? dayMatch[0].toUpperCase() : "MWF";
+
+            // SUBJECT EXTRACTION (Fuzzy Logic)
+            // We know Subject is between the EDP and the Day/Time
+            let midPart = cleanLine.split(days)[0].replace(edp, '').trim();
             
-            lines.forEach(line => {
-                let cleanLine = line.replace(/\t/g, ' ').trim();
-                const edpMatch = cleanLine.match(/^(\d{5})/);
-                if (!edpMatch) return; 
-                const edpCode = edpMatch[1];
-                const timeRegex = /(\d{1,2}:\d{2}\s?[AP]M)\s?[-–]\s?(\d{1,2}:\d{2}\s?[AP]M)/i;
-                const dayRegex = /(MWF|MW|TTH|SAT|FRI|TUE|THU)/i;
-                const timeMatch = cleanLine.match(timeRegex);
-                const dayMatch = cleanLine.match(dayRegex);
+            // Remove the Units digit (usually a 1, 2, or 3 right before the days)
+            let subject = midPart.replace(/\s*[1-5]\s*$/, '').trim();
+            
+            // ROOM EXTRACTION
+            // Room is usually the first word after the Time string
+            let afterTime = cleanLine.split(time)[1].trim();
+            let room = afterTime.split(/\s+/)[0] || "TBA";
 
-                if(timeMatch && dayMatch) {
-                    const fullTime = timeMatch[0];
-                    const startTime = timeMatch[1];
-                    const day = dayMatch[0].toUpperCase();
-                    let middlePart = cleanLine.replace(edpCode, '').split(dayMatch[0])[0].trim().split(/\s+/);
-                    if(middlePart.length > 0 && /^\d$/.test(middlePart[middlePart.length-1])) middlePart.pop();
-                    let lastWord = middlePart[middlePart.length-1];
-                    let type = "LEC"; 
-                    if(lastWord && ['LAB','LEC','L'].includes(lastWord)) {
-                        type = lastWord === 'L' ? 'LAB' : lastWord;
-                        middlePart.pop();
-                    }
-                    const subject = middlePart.join(" ");
-                    const afterTime = cleanLine.split(fullTime)[1] || "";
-                    let room = afterTime.trim().split(/\s{2,}/)[0] || afterTime.trim().split(/\s+/)[0] || "TBA";
-                    room = room.replace(/[^a-zA-Z0-9-]/g, '');
+            // If the room grabbed the Course (like CBE-506BSMA), slice it
+            // UC Rooms are usually 7 characters or less
+            if (room.length > 8 && /[A-Z]{2,}$/.test(room)) {
+                room = room.match(/^[A-Z0-9-]+/i)[0];
+            }
 
-                    const item = {
-                        edp: edpCode, subject, time: fullTime, room, type,
-                        sort: parseTime(startTime)
-                    };
+            // TYPE DETECTION
+            let type = "LEC";
+            if (cleanLine.toUpperCase().includes("LAB") || cleanLine.match(/\bL\b/)) {
+                type = "LAB";
+            }
 
-                    if(day.includes("SAT")) parsedData.sat.push(item);
-                    else if(day.includes("T") || day.includes("H")) parsedData.tth.push(item);
-                    else parsedData.mwf.push(item);
-                }
+            // SORTING & GROUPING
+            let group = 'mwf';
+            if (days.includes('TTH') || /^(T|TH|TUE|THU)$/.test(days)) group = 'tth';
+            else if (days.includes('SAT') || days === 'S') group = 'sat';
+
+            parsedData[group].push({
+                edp, 
+                subject: subject || "Untitled Subject", 
+                time, 
+                room, 
+                type,
+                sort: parseTime(time.split('-')[0])
             });
-
-            // Sort
-            const sorter = (a, b) => a.sort - b.sort;
-            parsedData.mwf.sort(sorter); parsedData.tth.sort(sorter); parsedData.sat.sort(sorter);
-
-            // Show UI
-            document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('resultArea').classList.remove('hidden');
-            document.getElementById('toolbar').classList.remove('hidden');
-            document.getElementById('fabCustomize').classList.remove('hidden');
-            renderAll();
+            foundCount++;
         }
+    });
+
+    if (foundCount > 0) {
+        // Finalize UI
+        const sorter = (a, b) => a.sort - b.sort;
+        parsedData.mwf.sort(sorter); 
+        parsedData.tth.sort(sorter); 
+        parsedData.sat.sort(sorter);
+
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('toolbar').classList.remove('hidden');
+        document.getElementById('fabCustomize').classList.remove('hidden');
+        
+        
+        renderAll();
+    } else {
+        alert("System failed to detect table rows. Please try to copy-paste the text manually.");
+    }
+}
+
+function updateHeaderTitle() {
+    let container = document.getElementById('scheduleContainer');
+    let titleEl = document.getElementById('schedTitle');
+    if(!titleEl) {
+        titleEl = document.createElement('div');
+        titleEl.id = 'schedTitle';
+        titleEl.className = "mb-8 p-6 border-b border-white/10 text-center";
+        container.prepend(titleEl);
+    }
+    titleEl.innerHTML = `
+        <p class="text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Official Study Load</p>
+        <h2 class="text-2xl font-black text-white uppercase">${studentName}</h2>
+    `;
+}
+
+// Helper to show the hidden UI elements
+function showResultUI() {
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('resultArea').classList.remove('hidden');
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('fabCustomize').classList.remove('hidden');
+    
+    // Set Student Name as Title
+    const container = document.getElementById('scheduleContainer');
+    let title = document.getElementById('dynTitle');
+    if (!title) {
+        title = document.createElement('h2');
+        title.id = 'dynTitle';
+        title.className = "text-center text-2xl font-black text-white mb-6 uppercase tracking-widest";
+        container.prepend(title);
+    }
+    title.innerText = studentName;
+}
+
+function parseTime(t) {
+    let [time, mod] = t.split(/([AP]M)/i);
+    let [h, m] = time.trim().split(':').map(Number);
+    if(h === 12) h = 0; if(mod.toUpperCase() === 'PM') h += 12;
+    return h * 60 + m;
+}
+
+// --- 3. UI RENDERER ---
+function updateUI() {
+    // Sort
+    const sorter = (a, b) => a.sort - b.sort;
+    parsedData.mwf.sort(sorter); 
+    parsedData.tth.sort(sorter); 
+    parsedData.sat.sort(sorter);
+
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('resultArea').classList.remove('hidden');
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('fabCustomize').classList.remove('hidden');
+
+    // Update Header with Student Name
+    const container = document.getElementById('scheduleContainer');
+    let titleEl = document.getElementById('schedTitle');
+    if(!titleEl) {
+        titleEl = document.createElement('div');
+        titleEl.id = 'schedTitle';
+        titleEl.className = "mb-8 p-6 border-b border-white/10 text-center";
+        container.prepend(titleEl);
+    }
+    titleEl.innerHTML = `
+        <p class="text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Official Study Load</p>
+        <h2 class="text-2xl font-black text-white uppercase">${studentName}</h2>
+    `;
+    
+    renderAll(); 
+}
+
 
        // --- RENDER ENGINE (Supports 5 Designs) ---
         function renderAll() {
@@ -753,6 +962,12 @@ function updateContainerStyle(style) {
     // Show watermark
     watermark.classList.remove('hidden');
 }
+
+
+
+
+
+
     </script>
 </body>
-</html>
+</html> 
