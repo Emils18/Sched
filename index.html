@@ -63,78 +63,118 @@
 
         
     </script>
-       <style>
-      /* --- 1. BASE STYLES --- */
+  <style>
+    /* --- 1. GLOBAL & AMBIENT GLOW --- */
     body { background-color: #030712; color: white; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
     :root { --theme-primary: #3b82f6; --theme-secondary: #a855f7; }
 
-    /* --- 2. THE ARTBOARD (Wallpaper Canvas) --- */
-  #scheduleContainer {
-    margin: 0 auto !important;
-    /* Use rgba so we can see the blobs behind the schedule */
-    background-color: rgba(3, 7, 18, 0.6) !important; 
-    backdrop-filter: blur(8px); /* Optional: adds a nice glass effect */
-    position: relative;
-    display: block !important; 
-    transition: width 0.3s ease, padding 0.3s ease;
-    box-sizing: border-box;
-    padding: 20px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
+    .ambient-light { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+    .shape { position: absolute; filter: blur(100px); opacity: 0.4; animation: blob 10s infinite alternate; }
+    .shape-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: var(--theme-primary); }
+    .shape-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: var(--theme-secondary); }
 
-/* Ensure the background blobs are actually behind everything */
-.ambient-light {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Behind the schedule */
-    pointer-events: none;
-}
-    
+    /* --- 2. BUTTONS VISIBILITY FIX --- */
+    .glass-btn { 
+        background: rgba(255, 255, 255, 0.1) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.2) !important; 
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    .glass-btn:hover { background: rgba(255, 255, 255, 0.2) !important; border-color: white !important; }
 
+    /* --- 3. THE ARTBOARD --- */
+    #scheduleContainer {
+        margin: 0 auto !important;
+        background-color: rgba(3, 7, 18, 0.4); 
+        position: relative;
+        display: block !important; 
+        transition: width 0.3s ease;
+        box-sizing: border-box;
+        padding: 25px;
+        border-radius: 32px;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    /* --- 3. THE LAYOUT ENGINE --- */
-    .day-section { width: 100%; margin-bottom: 1.5rem; padding: 0 20px; box-sizing: border-box; }
-    .day-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .card-grid { display: grid !important; gap: 10px; width: 100%; align-items: stretch; }
-
-    /* Grid Helpers */
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-    /* --- 4. CARDS (The Text-Safe Logic) --- */
+    /* --- 4. CARDS (Large Text Fix) --- */
     .card-draggable { 
-        cursor: grab; transition: transform 0.2s, opacity 0.2s; touch-action: none; 
-        width: 100%; min-width: 0; height: auto !important; display: flex; flex-direction: column; 
-        user-select: none; border-radius: 12px;
+        padding: 16px !important;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    .card-draggable h4 {
-        display: block !important; white-space: normal !important; overflow: visible !important;
-        word-break: break-word !important; line-height: 1.2 !important; font-size: 11px !important;
-        font-weight: 700; margin-bottom: 4px;
-    }
-    .dragging { opacity: 0.3; transform: scale(0.95); border: 2px dashed var(--theme-primary) !important; }
 
-    /* --- 5. UI COMPONENTS --- */
-    .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .glass-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.2s; }
-    .text-gradient { background: linear-gradient(to right, var(--theme-primary), var(--theme-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    /* SUBJECT NAME: Increased to 16px for clarity */
+    .card-draggable h4 {
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin: 8px 0 !important;
+        white-space: normal !important;
+    }
+
+    /* EDP TAG: Increased to 12px */
+    .edp-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px !important;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* INFO TEXT (Time/Room): 13px */
+    .info-text { font-size: 13px !important; font-weight: 500; opacity: 1 !important; }
+
+    .day-header { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; }
+    .card-grid { display: grid !important; gap: 15px; align-items: stretch; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* Dynamic Header Glow */
+.header-glow {
+    text-shadow: 0 0 30px var(--theme-primary);
+    transition: all 0.5s ease;
+}
+
+/* Dynamic Generate Button */
+#genBtn {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) !important;
+    box-shadow: 0 10px 20px -10px var(--theme-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+#genBtn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 40px -10px var(--theme-primary);
+}
+
+#genBtn:active {
+    transform: scale(0.95);
+}
+
+/* Smooth Title Gradient */
+.text-gradient {
+    background: linear-gradient(to right, var(--theme-primary), var(--theme-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.8s ease;
+}
 </style>
 
 
@@ -154,7 +194,7 @@
         <header class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 animate-fade-up">
             <div class="relative">
                 <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-2">
-                    Study Load <br> <span class="text-gradient">Sorter AI</span>
+                    Study Load <br> <span class="text-gradient header-glow">Sorter AI</span>
                 </h1>
                 <p class="text-slate-400 font-light text-lg">Paste text. Choose design. Save image.</p>
             </div>
@@ -201,11 +241,11 @@
                 placeholder="Paste directly from your study load...&#10;41200 CC-TECHNO32 3 MWF 3:30 PM - 4:30 PM"></textarea>
 
                 <div class="mt-8 flex justify-end">
-                    <button id="genBtn" onclick="processSchedule()" class="relative overflow-hidden bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-xl transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] active:scale-95 group">
-                        <span class="relative z-10 flex items-center gap-2">
-                            Generate <i class="fa-solid fa-bolt"></i>
-                        </span>
-                    </button>
+                    <button id="genBtn" onclick="processSchedule()" class="relative overflow-hidden text-white font-black py-4 px-12 rounded-2xl transition-all uppercase tracking-widest group">
+    <span class="relative z-10 flex items-center gap-3">
+        Generate <i class="fa-solid fa-bolt animate-pulse"></i>
+    </span>
+</button>
                 </div>
             </div>
         </div>
@@ -326,8 +366,8 @@
                 <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    <!-- Cosmic (Default) -->
+        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <!-- Cosmic -->
     <div onclick="setDesign('cosmic')" class="cursor-pointer group">
         <div class="bg-[#030712] border border-blue-500/50 h-32 rounded-xl flex items-center justify-center font-bold text-white group-hover:ring-2 ring-blue-500 transition">Cosmic Glass</div>
         <p class="text-xs text-center text-slate-400 mt-2">Default Dark Mode</p>
@@ -338,58 +378,31 @@
         <p class="text-xs text-center text-slate-400 mt-2">Minimalist Light</p>
     </div>
     <!-- Cyberpunk -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">GE HIMO PA</span>
-        </div>
-        <div class="bg-black border-2 border-green-500 h-32 flex items-center justify-center font-bold text-green-500 font-mono">CYBERPUNK</div>
-        <p class="text-xs text-center text-slate-500 mt-2">High Contrast Neon</p>
+    <div onclick="setDesign('cyber')" class="cursor-pointer group">
+        <div class="bg-black border-2 border-green-500 h-32 flex items-center justify-center font-bold text-green-500 font-mono group-hover:shadow-[0_0_15px_#22c55e] transition">CYBERPUNK</div>
+        <p class="text-xs text-center text-slate-400 mt-2">High Contrast Neon</p>
     </div>
-
     <!-- Sketchbook -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">Not Available Yet</span>
-        </div>
-        <div class="bg-[#fef9c3] border border-yellow-600 h-32 rounded-sm flex items-center justify-center font-bold text-slate-700 font-serif">Sketchbook</div>
-        <p class="text-xs text-center text-slate-500 mt-2">Handwritten Style</p>
-    </div>
-
-    <!-- Blueprint -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">Not Available Yet</span>
-        </div>
-        <div class="bg-[#1e3a8a] border border-blue-300/30 h-32 rounded-sm flex items-center justify-center font-bold text-blue-100 font-mono">Blueprint</div>
-        <p class="text-xs text-center text-slate-500 mt-2">Technical Grid</p>
-    </div>
-
-    <!-- Stealth Dark -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">Not Available Yet</span>
-        </div>
-        <div class="bg-[#111111] border border-white/10 h-32 rounded-3xl flex items-center justify-center font-bold text-slate-400">Stealth Dark</div>
-        <p class="text-xs text-center text-slate-500 mt-2">Minimalist Dark</p>
-    </div>
-
-    <!-- Soft Rose -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">Not Available Yet</span>
-        </div>
-        <div class="bg-[#fff1f2] border border-rose-200 h-32 rounded-full flex items-center justify-center font-bold text-rose-400">Soft Rose</div>
-        <p class="text-xs text-center text-slate-500 mt-2">Aesthetic Light</p>
-    </div>
-
-    <!-- Modern Pro -->
-    <div class="relative cursor-not-allowed group opacity-50 grayscale">
-        <div class="absolute inset-0 z-20 flex items-center justify-center">
-            <span class="bg-red-600/90 text-white text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase rotate-[-10deg]">Not Available Yet</span>
-        </div>
-        <div class="bg-white border-t-8 border-blue-600 h-32 shadow-xl flex items-center justify-center font-bold text-slate-800">Modern Pro</div>
-        <p class="text-xs text-center text-slate-500 mt-2">Clean Professional</p>
-    </div>
+   <div onclick="setDesign('notebook')" class="cursor-pointer group">
+    <div class="bg-[#fef9c3] h-32 rounded-xl border border-yellow-600 flex items-center justify-center text-slate-700 font-serif border-l-[20px] border-l-red-300">Sketchbook</div>
+    <p class="text-xs text-center text-slate-500 mt-2">Handwritten Style</p>
+</div>
+<div onclick="setDesign('blueprint')" class="cursor-pointer group">
+    <div class="bg-[#1e3a8a] h-32 rounded-xl border-4 border-double border-white flex items-center justify-center text-white font-mono" style="background-image: radial-gradient(white 0.5px, transparent 0.5px); background-size: 10px 10px;">Blueprint</div>
+    <p class="text-xs text-center text-slate-500 mt-2">Technical Grid</p>
+</div>
+<div onclick="setDesign('stealth')" class="cursor-pointer group">
+    <div class="bg-black h-32 rounded-xl border border-white/20 flex items-center justify-center text-slate-400 font-bold">Stealth Dark</div>
+    <p class="text-xs text-center text-slate-500 mt-2">Minimalist Dark</p>
+</div>
+<div onclick="setDesign('rose')" class="cursor-pointer group">
+    <div class="bg-[#fff1f2] h-32 rounded-full border border-rose-200 flex items-center justify-center text-rose-400 font-bold">Soft Rose</div>
+    <p class="text-xs text-center text-slate-500 mt-2">Aesthetic Light</p>
+</div>
+<div onclick="setDesign('pro')" class="cursor-pointer group">
+    <div class="bg-white h-32 rounded-xl border-t-8 border-blue-600 shadow-lg flex items-center justify-center text-slate-800 font-black">Modern Pro</div>
+    <p class="text-xs text-center text-slate-500 mt-2">Clean Professional</p>
+</div>
 </div>
 
      </div>
@@ -455,323 +468,377 @@
     </div>
 
         <script>
-            // GLOBAL STATE
-            let currentTemplate = 'cosmic';
-            let parsedData = { mwf: [], tth: [], sat: [] };
-            let currentDesign = 'glass'; // glass, paper, cyber
-            let currentColor = 'emerald'; // Default
+    // --- GLOBAL STATE ---
+    let currentTemplate = 'cosmic';
+    let parsedData = { mwf: [], tth: [], sat: [] };
+    let studentName = "UC Student";
+    let canvasSettings = { width: 420, cols: 2, scale: 0.9, top: 80, mode: 'desktop' };
+
+    const themes = {
+        BSIT: { primary: '#3b82f6', secondary: '#a855f7', button: 'bg-blue-600' },
+        MARITIME: { primary: '#0ea5e9', secondary: '#1e3a8a', button: 'bg-sky-600' },
+        ENGINEERING: { primary: '#f97316', secondary: '#dc2626', button: 'bg-orange-600' },
+        CUSTOMS: { primary: '#10b981', secondary: '#0f766e', button: 'bg-emerald-600' },
+        EDUCATION: { primary: '#ec4899', secondary: '#be123c', button: 'bg-pink-600' }
+    };
+
+    // --- DESIGN ENGINE ---
+    function setDesign(style) {
+        if (style === 'glass') style = 'cosmic';
+        currentTemplate = style;
         
-        let canvasSettings = { width: 420, cols: 2, scale: 0.9, top: 80, mode: 'desktop' };
+        // Update Indicator
+        ['glass', 'paper'].forEach(id => {
+            const btn = document.getElementById(`btn-${id}`);
+            if (btn) btn.className = (id === style || (id === 'glass' && style === 'cosmic')) ? 
+                "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow" : 
+                "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400";
+        });
+
+        updateContainerStyle(style);
+        renderAll();
+        if(typeof closeTemplateModal === 'function') closeTemplateModal();
+    }
+
+    function applyTemplate(style) { setDesign(style); }
+
+    function updateContainerStyle(style) {
+        const container = document.getElementById('scheduleContainer');
+        const watermark = document.getElementById('watermark');
+        const blobs = document.querySelector('.ambient-light');
+
+        container.style = ""; 
+        container.className = "p-4 rounded-2xl relative overflow-hidden transition-all duration-500";
+        if (blobs) blobs.style.display = 'block';
+
+        if (style === 'paper') {
+            container.style.backgroundColor = '#ffffff';
+            watermark.className = "text-center pt-6 border-t border-gray-200 mt-4 text-[10px] text-gray-400 font-bold uppercase";
+        } else if (style === 'cyber') {
+            container.style.backgroundColor = '#000000';
+            container.style.border = '2px solid #22c55e';
+            watermark.className = "text-center pt-6 border-t border-green-900 mt-4 text-[10px] text-green-500 font-mono";
+        } else if (style === 'notebook') {
+            container.style.backgroundColor = '#fef9c3';
+            container.style.backgroundImage = 'linear-gradient(#94a3b8 1px, transparent 1px)';
+            container.style.backgroundSize = '100% 25px';
+            container.style.borderLeft = '40px solid #fecaca';
+        } else if (style === 'blueprint') {
+            container.style.backgroundColor = '#172554';
+            container.style.backgroundImage = 'radial-gradient(#3b82f6 0.5px, transparent 0.5px)';
+            container.style.backgroundSize = '15px 15px';
+            container.style.border = '4px double white';
+        } else if (style === 'stealth') {
+            container.style.backgroundColor = '#0a0a0a';
+            container.style.border = '1px solid #334155';
+        } else if (style === 'rose') {
+            container.style.backgroundColor = '#fff1f2';
+        } else if (style === 'pro') {
+            container.style.backgroundColor = '#f8fafc';
+            container.style.borderTop = '10px solid #2563eb';
+        } else {
+            container.style.backgroundColor = 'rgba(3, 7, 18, 0.6)';
+            if (blobs) blobs.style.display = 'block';
+        }
+    }
+
+    // --- CARD RENDERER (ALL DESIGNS) ---
+  function generateCardHTML(c, themeColor) {
+    const colors = { emerald: '#10b981', amber: '#f59e0b', pink: '#ec4899' };
+    const borderCol = colors[themeColor] || '#3b82f6';
+    
+    // TEMPLATE 1: PAPER (Clean & Large)
+    if(currentTemplate === 'paper') {
+        return `<div draggable="true" class="card-draggable bg-white border-2 border-gray-100 shadow-md mb-1 text-gray-800">
+            <div class="flex justify-between items-center mb-2">
+                <span class="edp-tag" style="background:#f1f5f9; color:#1e293b; border-color:#cbd5e1">${c.edp}</span>
+                <span class="text-[10px] font-bold text-gray-400 uppercase">${c.type}</span>
+            </div>
+            <h4 style="color:#0f172a">${c.subject}</h4>
+            <div class="mt-2 text-[12px] text-gray-500 font-medium border-t pt-2">
+                <div><i class="fa-regular fa-clock"></i> ${c.time}</div>
+                <div><i class="fa-solid fa-location-dot"></i> ${c.room}</div>
+            </div>
+        </div>`;
+    } 
+
+    // TEMPLATE 2: CYBERPUNK (Neon Highlight)
+    if(currentTemplate === 'cyber') {
+        return `<div draggable="true" class="card-draggable bg-black border-2 border-green-500 p-3 mb-1 text-green-400 font-cyber shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+            <div class="flex justify-between items-center mb-2">
+                <span class="edp-tag" style="border-color:#22c55e; color:#22c55e">${c.edp}</span>
+                <span class="text-[10px] font-black uppercase">>> ${c.type}</span>
+            </div>
+            <h4 class="text-white">${c.subject}</h4>
+            <p class="text-[11px] mt-2 font-mono opacity-90">LOC: ${c.room} | ${c.time}</p>
+        </div>`;
+    }
+
+    // TEMPLATE 3: SKETCHBOOK (Handwritten but Bold)
+    if(currentTemplate === 'notebook') {
+        return `<div draggable="true" class="card-draggable bg-white/60 border-b-4 border-blue-200 -rotate-1 mb-2 text-blue-900 font-hand shadow-sm">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold underline decoration-red-400">${c.edp}</span>
+                <span class="text-[10px] opacity-60">${c.type}</span>
+            </div>
+            <h4 class="text-blue-900 font-black">${c.subject}</h4>
+            <p class="text-[12px] mt-1">${c.time} @ ${c.room}</p>
+        </div>`;
+    }
+
+    // TEMPLATE 4: BLUEPRINT (Technical)
+    if(currentTemplate === 'blueprint') {
+        return `<div draggable="true" class="card-draggable border-2 border-white/40 bg-blue-600/20 p-3 mb-1 font-mono text-white">
+            <div class="flex justify-between mb-2">
+                <span class="edp-tag" style="background:#fff; color:#1e3a8a">${c.edp}</span>
+                <span class="text-[10px]">[${c.type}]</span>
+            </div>
+            <h4 class="text-white font-bold underline decoration-white/30">${c.subject}</h4>
+            <p class="text-[11px] mt-2 opacity-90">${c.time} | RM:${c.room}</p>
+        </div>`;
+    }
+
+    // TEMPLATE 5: STEALTH DARK (High Contrast)
+    if(currentTemplate === 'stealth') {
+        return `<div draggable="true" class="card-draggable bg-[#111] border border-white/10 p-4 mb-1 text-slate-100 shadow-2xl">
+            <div class="flex justify-between items-center mb-2">
+                <span class="edp-tag" style="border-color:#334155; background:#000">${c.edp}</span>
+                <span class="text-[10px] font-bold text-slate-500">${c.type}</span>
+            </div>
+            <h4 class="text-white">${c.subject}</h4>
+            <div class="mt-2 text-[12px] text-slate-400 flex flex-col gap-1">
+                <span><i class="fa-regular fa-clock"></i> ${c.time}</span>
+                <span><i class="fa-solid fa-location-dot"></i> ${c.room}</span>
+            </div>
+        </div>`;
+    }
+
+    // TEMPLATE 6: SOFT ROSE (Pill Shape)
+    if(currentTemplate === 'rose') {
+        return `<div draggable="true" class="card-draggable bg-white/90 p-4 rounded-[2.5rem] border border-rose-100 shadow-sm mb-1 text-center">
+            <span class="text-[11px] font-black text-rose-300 tracking-tighter">EDP ${c.edp}</span>
+            <h4 class="text-rose-500 font-extrabold uppercase">${c.subject}</h4>
+            <p class="text-rose-400 text-[11px] font-medium italic">${c.time} • ${c.room}</p>
+        </div>`;
+    }
+
+    // TEMPLATE 7: MODERN PRO (The Sharpest Look)
+    if(currentTemplate === 'pro') {
+        return `<div draggable="true" class="card-draggable bg-white p-4 border-l-8 shadow-lg mb-1 flex flex-col" style="border-left-color: ${borderCol}">
+            <div class="flex justify-between items-center mb-2">
+                <span class="edp-tag" style="background:#1e293b; border:none">${c.edp}</span>
+                <span class="text-[10px] font-black text-gray-300 uppercase">${c.type}</span>
+            </div>
+            <h4 class="text-slate-900 font-black tracking-tighter">${c.subject}</h4>
+            <p class="text-slate-500 text-[12px] mt-2 font-bold uppercase"><i class="fa-regular fa-clock"></i> ${c.time} | ${c.room}</p>
+        </div>`;
+    }
+
+    // DEFAULT: POLISHED COSMIC GLASS (Based on Image 2)
+    return `
+    <div draggable="true" class="card-draggable glass-panel relative overflow-hidden flex flex-col border border-white/10 hover:border-white/20 transition-all shadow-xl">
+        <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${borderCol}; box-shadow: 0 0 15px ${borderCol}"></div>
         
+        <div class="flex justify-between items-center mb-2">
+            <span class="edp-tag" style="background:rgba(255,255,255,0.05); border-color:${borderCol}88">${c.edp}</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${c.type}</span>
+        </div>
 
+        <h4 class="text-white uppercase tracking-tight">${c.subject}</h4>
 
- // --- UNIFIED DESIGN LOGIC ---
-function setDesign(style) {
-    // 1. Logic Sync: Map 'glass' button to 'cosmic' template
-    const templateName = (style === 'glass') ? 'cosmic' : style;
-    currentTemplate = templateName;
+        <div class="mt-auto pt-3 flex flex-col gap-1.5">
+            <div class="info-text text-slate-300">
+                <i class="fa-regular fa-clock text-blue-400"></i>
+                <span>${c.time.replace('-', ' - ')}</span>
+            </div>
+            <div class="info-text text-slate-300">
+                <i class="fa-solid fa-location-dot text-slate-500"></i>
+                <span class="font-mono font-bold">${c.room}</span>
+            </div>
+        </div>
+    </div>`;
+}
 
-    // 2. Indicator Fix: Update Button Colors
-    const designButtons = ['glass', 'paper'];
-    designButtons.forEach(id => {
-        const btn = document.getElementById(`btn-${id}`);
-        if (btn) {
-            if (id === style) {
-                // Make this button blue
-                btn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow";
-            } else {
-                // Make other buttons grey
-                btn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white";
+    // --- 4. RENDER ENGINE ---
+    function renderAll() {
+        const container = document.getElementById('resultArea');
+        container.innerHTML = ''; container.className = "flex flex-col w-full";
+        
+        const days = [
+            { id: 'mwf', title: 'Mon / Wed / Fri', data: parsedData.mwf, color: 'emerald', hex: '#10b981' },
+            { id: 'tth', title: 'Tue / Thu', data: parsedData.tth, color: 'amber', hex: '#f59e0b' },
+            { id: 'sat', title: 'Saturday', data: parsedData.sat, color: 'pink', hex: '#ec4899' }
+        ];
+
+        days.forEach(dayGroup => {
+            if (dayGroup.data.length === 0) return;
+            const section = document.createElement('div');
+            section.className = "day-section w-full";
+            const cols = canvasSettings.mode === 'desktop' ? 3 : canvasSettings.cols;
+            section.innerHTML = `
+                <div class="day-header flex items-center justify-between border-b border-white/5 pb-2 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="dot-glow" style="background-color: ${dayGroup.hex}; color: ${dayGroup.hex}; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 10px ${dayGroup.hex}"></div>
+                        <h2 class="text-[10px] font-black text-slate-300 uppercase tracking-widest">${dayGroup.title}</h2>
+                    </div>
+                   <span class="text-[13px] font-bold font-mono opacity-80 bg-white/10 px-3 py-1 rounded-lg border border-white/5">${dayGroup.data.length} Class</span>
+                </div>
+                <div class="card-grid grid grid-cols-${cols} gap-3"></div>
+            `;
+            const grid = section.querySelector('.card-grid');
+            dayGroup.data.sort((a,b)=>a.sort-b.sort).forEach(c => { grid.innerHTML += generateCardHTML(c, dayGroup.color); });
+            container.appendChild(section);
+        });
+        initDragAndDrop();
+        syncCanvas();
+    }
+
+    // --- 5. SYSTEM LOGIC ---
+    function setLayout(mode) {
+        canvasSettings.mode = mode;
+        const ctrls = document.getElementById('layoutControls');
+        const container = document.getElementById('scheduleContainer');
+        if (mode === 'desktop') {
+            ctrls.classList.add('hidden');
+            container.style.width = "100%"; container.style.maxWidth = "1200px";
+            container.style.paddingTop = "20px"; document.getElementById('resultArea').style.zoom = "1";
+        } else {
+            ctrls.classList.remove('hidden'); container.style.maxWidth = "none"; syncCanvas();
+        }
+        renderAll();
+    }
+
+    function adjustCanvas(type, val) {
+        canvasSettings[type] = val;
+        if (type === 'cols') renderAll();
+        else syncCanvas();
+    }
+
+    function syncCanvas() {
+        const container = document.getElementById('scheduleContainer');
+        if (canvasSettings.mode === 'mobile') {
+            container.style.width = canvasSettings.width + "px";
+            container.style.paddingTop = canvasSettings.top + "px";
+            container.style.margin = "0 auto";
+            document.getElementById('resultArea').style.zoom = canvasSettings.scale;
+        }
+    }
+
+    function downloadImage() {
+        const element = document.getElementById('scheduleContainer');
+        const watermark = document.getElementById('watermark');
+        watermark.classList.remove('hidden');
+        const btn = document.querySelector('button[onclick="downloadImage()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Capturing...`;
+
+        const capWidth = canvasSettings.mode === 'mobile' ? parseInt(canvasSettings.width) : element.offsetWidth;
+
+        html2canvas(element, {
+            backgroundColor: currentTemplate === 'paper' || currentTemplate === 'pro' ? '#ffffff' : (currentTemplate === 'cyber' ? '#000000' : '#030712'),
+            scale: 4, useCORS: true, allowTaint: true, width: element.offsetWidth, height: element.offsetHeight,
+            onclone: (cloned) => {
+                const root = cloned.getElementById('scheduleContainer');
+                const res = cloned.getElementById('resultArea');
+                root.style.zoom = "1"; root.style.width = capWidth + "px";
+                res.style.zoom = "1"; res.style.transform = "none";
+                cloned.querySelectorAll('.card-draggable h4').forEach(h4 => {
+                    h4.style.whiteSpace = "normal"; h4.style.overflow = "visible";
+                });
             }
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `UC_Schedule_${Date.now()}.png`;
+            link.href = canvas.toDataURL("image/png",1.0);
+            link.click();
+            btn.innerHTML = originalText; watermark.classList.add('hidden');
+        });
+    }
+
+    // PDF, Drag & Drop, and Init Utils...
+    async function handlePDF(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const labelSpan = document.getElementById('pdfLabel');
+        labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Reading...`;
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                let items = textContent.items.sort((a, b) => {
+                    if (Math.abs(a.transform[5] - b.transform[5]) > 4) return b.transform[5] - a.transform[5];
+                    return a.transform[4] - b.transform[4];
+                });
+                let lastY = -1; let lastX = -1;
+                for (let item of items) {
+                    let cX = item.transform[4]; let cY = item.transform[5];
+                    if (lastY !== -1 && Math.abs(cY - lastY) > 4) fullText += "\n";
+                    else if (lastX !== -1 && (cX - lastX) > 6) fullText += " ";
+                    fullText += item.str; lastY = cY; lastX = cX + (item.width || 0);
+                }
+            }
+            document.getElementById('rawInput').value = fullText;
+            labelSpan.innerHTML = `<i class="fa-solid fa-check"></i> Loaded!`;
+        } catch (e) { alert("PDF Error: " + e.message); }
+    }
+
+   function processSchedule() {
+    const raw = document.getElementById('rawInput').value;
+    if (!raw.trim()) return;
+    localStorage.setItem('uc_schedule_data', raw);
+    parsedData = { mwf: [], tth: [], sat: [] };
+    
+    const cleanRaw = raw.replace(/(\d)\s+(?=\d)/g, '$1').replace(/(\w)\s*-\s*(\w)/g, '$1-$2');
+    const lines = cleanRaw.split('\n');
+    
+    lines.forEach(line => {
+        const edpMatch = line.match(/\b\d{5}\b/);
+        const timeMatch = line.match(/(\d{1,2}:\d{2}\s*[AP]M-\d{1,2}:\d{2}\s*[AP]M)/i);
+        
+        if (edpMatch && timeMatch) {
+            const edp = edpMatch[0]; 
+            const time = timeMatch[0].toUpperCase();
+            const dayMatch = line.match(/\b(MWF|TTH|SAT|MW|TUE|THU|FRI|M|W|F|T|S|TH)\b/i);
+            const days = dayMatch ? dayMatch[0].toUpperCase() : "MWF";
+            
+            // 1. Isolate the part before the time to find the Type (LEC/LAB)
+            const partBeforeTime = line.split(time)[0].toUpperCase();
+            
+            // 2. SURGICAL TYPE DETECTION 
+            // \b means "Exact Word". This prevents "C1" or "M1" from being caught as "L"
+            let type = "LEC";
+            if (/\b(LAB|L|LB)\b/.test(partBeforeTime)) {
+                type = "LAB";
+            }
+
+            let subject = line.split(days)[0].replace(edp, '').replace(/\s*\d\s*$/, '').trim();
+            
+            // Clean subject: Remove the "L" or "LAB" word if it's stuck to the subject name
+            subject = subject.replace(/\b(LAB|L|LB|LEC)\b/gi, '').trim();
+
+            let room = (line.split(time)[1] || "").trim().split(/\s+/)[0] || "TBA";
+            let group = days.includes('TTH') || /^(T|TH|TUE|THU)$/.test(days) ? 'tth' : (days.includes('SAT') ? 'sat' : 'mwf');
+
+            parsedData[group].push({ 
+                edp, 
+                subject, 
+                time, 
+                room, 
+                type, // This is now 100% accurate
+                sort: parseTime(time.split('-')[0]) 
+            });
         }
     });
 
-    // 3. Update Visuals
-    updateContainerStyle(templateName);
-    renderAll();
-    
-    if(typeof closeTemplateModal === 'function') closeTemplateModal();
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('resultArea').classList.remove('hidden');
+    document.getElementById('fabCustomize').classList.remove('hidden');
+    setLayout('desktop');
 }
-
-// Ensure the Modal buttons also work
-function applyTemplate(style) { setDesign(style); }
-
-function updateContainerStyle(style) {
-    const container = document.getElementById('scheduleContainer');
-    const watermark = document.getElementById('watermark');
-    const blobs = container.querySelector('.ambient-light');
-
-    // Reset Defaults
-    container.style = ""; 
-    container.className = "p-4 rounded-2xl relative overflow-hidden transition-all duration-500";
-    if (blobs) blobs.style.display = 'none';
-
-    if (style === 'paper') {
-        container.style.backgroundColor = '#ffffff';
-        watermark.className = "text-center pt-6 border-t border-gray-200 mt-4 text-[10px] text-gray-400 font-bold uppercase";
-   
-    } else if (style === 'notebook') {
-        container.style.backgroundColor = '#fef9c3';
-        container.style.backgroundImage = 'linear-gradient(#e5e7eb 1px, transparent 1px)';
-        container.style.backgroundSize = '20px 20px';
-    } else if (style === 'blueprint') {
-        container.style.backgroundColor = '#172554';
-        container.style.backgroundImage = 'radial-gradient(#3b82f6 1px, transparent 1px)';
-        container.style.backgroundSize = '20px 20px';
-    } else if (style === 'stealth') {
-        container.style.backgroundColor = '#0a0a0a';
-    } else if (style === 'rose') {
-        container.style.backgroundColor = '#fff1f2';
-    } else if (style === 'pro') {
-        container.style.backgroundColor = '#f8fafc';
-        container.style.borderTop = '10px solid #2563eb';
-    } else {
-        // Cosmic (Default Glass)
-        container.style.backgroundColor = '#030712';
-        if (blobs) blobs.style.display = 'block';
-    }
-}
-            
-
-
-
-            
-    // --- 1. COORDINATE-SORTED PDF READER (WITH SMART WELDING) ---
-            async function handlePDF(input) {
-                const file = input.files[0];
-                if (!file) return;
-
-                const labelSpan = document.getElementById('pdfLabel');
-                const originalContent = labelSpan.innerHTML;
-                labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Reading PDF...`;
-
-                try {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                    let fullText = "";
-
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        
-                        let items = textContent.items.sort((a, b) => {
-                            if (Math.abs(a.transform[5] - b.transform[5]) > 4) return b.transform[5] - a.transform[5];
-                            return a.transform[4] - b.transform[4];
-                        });
-
-                        let lastY = -1;
-                        let lastX = -1;
-                        for (let item of items) {
-                            let currentX = item.transform[4];
-                            let currentY = item.transform[5];
-
-                            if (lastY !== -1 && Math.abs(currentY - lastY) > 4) {
-                                fullText += "\n";
-                            } 
-                            else if (lastX !== -1 && (currentX - lastX) > 6) { 
-                                fullText += " "; 
-                            }
-
-                            fullText += item.str;
-                            lastY = currentY;
-                            lastX = currentX + (item.width || 0);
-                        }
-                    }
-
-                    // 1. Put text in the box
-                    document.getElementById('rawInput').value = fullText;
-                    
-                    // 2. Feedback only - Removed processSchedule() so it waits for click
-                    labelSpan.innerHTML = `<i class="fa-solid fa-check"></i> Ready to Generate!`;
-                    
-                    setTimeout(() => {
-                        labelSpan.innerHTML = originalContent;
-                        input.value = ''; 
-                    }, 3000);
-
-                } catch (error) {
-                    alert("PDF Error: " + error.message);
-                    labelSpan.innerHTML = originalContent;
-                }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // THEMES
-            const themes = {
-                BSIT: { primary: '#3b82f6', secondary: '#a855f7', button: 'bg-blue-600' },
-                MARITIME: { primary: '#0ea5e9', secondary: '#1e3a8a', button: 'bg-sky-600' },
-                ENGINEERING: { primary: '#f97316', secondary: '#dc2626', button: 'bg-orange-600' },
-                CUSTOMS: { primary: '#10b981', secondary: '#0f766e', button: 'bg-emerald-600' },
-                EDUCATION: { primary: '#ec4899', secondary: '#be123c', button: 'bg-pink-600' }
-            };
-
-            // --- INIT ---
-            window.onload = function() {
-                const savedData = localStorage.getItem('uc_schedule_data');
-                const savedTheme = localStorage.getItem('uc_theme') || 'BSIT';
-                document.getElementById('deptSelect').value = savedTheme;
-                changeTheme(savedTheme);
-                if(savedData) {
-                    document.getElementById('rawInput').value = savedData;
-                    processSchedule();
-                }
-            }
-
-            // --- THEME ENGINE ---
-            function changeTheme(dept) {
-                const theme = themes[dept];
-                const root = document.documentElement;
-                localStorage.setItem('uc_theme', dept);
-                root.style.setProperty('--theme-primary', theme.primary);
-                root.style.setProperty('--theme-secondary', theme.secondary);
-                const btn = document.getElementById('genBtn');
-                btn.className = btn.className.replace(/bg-\w+-600/g, ''); 
-                btn.classList.add(theme.button);
-            }
-
-            
-
-    // --- 2. THE UNIFIED FUZZY PROCESSOR ---
-    function processSchedule() {
-        const raw = document.getElementById('rawInput').value;
-        if (!raw.trim()) return;
-
-        localStorage.setItem('uc_schedule_data', raw);
-        parsedData = { mwf: [], tth: [], sat: [] };
-        
-        // 1. Get Student Name (Header Logic)
-        const nameMatch = raw.match(/Name\s*[:\s]*([^(\n|]+)/i);
-        if (nameMatch) {
-            studentName = nameMatch[1].replace(/Name/gi, '').trim().split('(')[0].trim();
-        }
-
-        const lines = raw.split('\n');
-        let foundCount = 0;
-
-        lines.forEach(line => {
-            // Clean line noise and standardize dashes
-            const cleanLine = line.replace(/[–—]/g, '-').trim();
-
-            // ANCHORS: We need an EDP (5 digits) and a Time (00:00 AM - 00:00 PM)
-            const edpMatch = cleanLine.match(/\b\d{5}\b/);
-            const timeMatch = cleanLine.match(/(\d{1,2}:\d{2}\s*[AP]M\s*-\s*\d{1,2}:\d{2}\s*[AP]M)/i);
-
-            if (edpMatch && timeMatch) {
-                const edp = edpMatch[0];
-                const time = timeMatch[0].toUpperCase();
-
-                // Find Day Pattern
-                const dayMatch = cleanLine.match(/\b(MWF|TTH|SAT|MW|TUE|THU|FRI|S|M|W|F|T|TH)\b/i);
-                const days = dayMatch ? dayMatch[0].toUpperCase() : "MWF";
-
-                // SUBJECT EXTRACTION (Fuzzy Logic)
-                // We know Subject is between the EDP and the Day/Time
-                let midPart = cleanLine.split(days)[0].replace(edp, '').trim();
-                
-                // Remove the Units digit (usually a 1, 2, or 3 right before the days)
-                let subject = midPart.replace(/\s*[1-5]\s*$/, '').trim();
-                
-                // ROOM EXTRACTION
-                // Room is usually the first word after the Time string
-                let afterTime = cleanLine.split(time)[1].trim();
-                let room = afterTime.split(/\s+/)[0] || "TBA";
-
-                // If the room grabbed the Course (like CBE-506BSMA), slice it
-                // UC Rooms are usually 7 characters or less
-                if (room.length > 8 && /[A-Z]{2,}$/.test(room)) {
-                    room = room.match(/^[A-Z0-9-]+/i)[0];
-                }
-
-                // TYPE DETECTION
-                let type = "LEC";
-                if (cleanLine.toUpperCase().includes("LAB") || cleanLine.match(/\bL\b/)) {
-                    type = "LAB";
-                }
-
-                // SORTING & GROUPING
-                let group = 'mwf';
-                if (days.includes('TTH') || /^(T|TH|TUE|THU)$/.test(days)) group = 'tth';
-                else if (days.includes('SAT') || days === 'S') group = 'sat';
-
-                parsedData[group].push({
-                    edp, 
-                    subject: subject || "Untitled Subject", 
-                    time, 
-                    room, 
-                    type,
-                    sort: parseTime(time.split('-')[0])
-                });
-                foundCount++;
-            }
-        });
-
-        if (foundCount > 0) {
-            // Finalize UI
-            const sorter = (a, b) => a.sort - b.sort;
-            parsedData.mwf.sort(sorter); 
-            parsedData.tth.sort(sorter); 
-            parsedData.sat.sort(sorter);
-
-            document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('resultArea').classList.remove('hidden');
-            document.getElementById('toolbar').classList.remove('hidden');
-            document.getElementById('fabCustomize').classList.remove('hidden');
-            
-            
-            renderAll();
-        } else {
-            alert("System failed to detect table rows. Please try to copy-paste the text manually.");
-        }
-    }
-
-    function updateHeaderTitle() {
-        let container = document.getElementById('scheduleContainer');
-        let titleEl = document.getElementById('schedTitle');
-        if(!titleEl) {
-            titleEl = document.createElement('div');
-            titleEl.id = 'schedTitle';
-            titleEl.className = "mb-8 p-6 border-b border-white/10 text-center";
-            container.prepend(titleEl);
-        }
-        titleEl.innerHTML = `
-            <p class="text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Official Study Load</p>
-            <h2 class="text-2xl font-black text-white uppercase">${studentName}</h2>
-        `;
-    }
-
-    // Helper to show the hidden UI elements
-    function showResultUI() {
-        document.getElementById('emptyState').classList.add('hidden');
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('toolbar').classList.remove('hidden');
-        document.getElementById('fabCustomize').classList.remove('hidden');
-        
-        // Set Student Name as Title
-        const container = document.getElementById('scheduleContainer');
-        let title = document.getElementById('dynTitle');
-        if (!title) {
-            title = document.createElement('h2');
-            title.id = 'dynTitle';
-            title.className = "text-center text-2xl font-black text-white mb-6 uppercase tracking-widest";
-            container.prepend(title);
-        }
-        title.innerText = studentName;
-    }
 
     function parseTime(t) {
         let [time, mod] = t.split(/([AP]M)/i);
@@ -780,526 +847,61 @@ function updateContainerStyle(style) {
         return h * 60 + m;
     }
 
-    // --- 3. UI RENDERER ---
-    function updateUI() {
-        // Sort
-        const sorter = (a, b) => a.sort - b.sort;
-        parsedData.mwf.sort(sorter); 
-        parsedData.tth.sort(sorter); 
-        parsedData.sat.sort(sorter);
-
-        document.getElementById('emptyState').classList.add('hidden');
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('toolbar').classList.remove('hidden');
-        document.getElementById('fabCustomize').classList.remove('hidden');
-
-        // Update Header with Student Name
-        const container = document.getElementById('scheduleContainer');
-        let titleEl = document.getElementById('schedTitle');
-        if(!titleEl) {
-            titleEl = document.createElement('div');
-            titleEl.id = 'schedTitle';
-            titleEl.className = "mb-8 p-6 border-b border-white/10 text-center";
-            container.prepend(titleEl);
-        }
-        titleEl.innerHTML = `
-            <p class="text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Official Study Load</p>
-            <h2 class="text-2xl font-black text-white uppercase">${studentName}</h2>
-        `;
-        
-        renderAll(); 
-    }
-
-
-
-    function changeDensity(val) {
-        canvasSettings.cols = val;
-        // Update button colors
-        document.getElementById('den-1').className = val == 1 ? "flex-1 py-1.5 text-[10px] font-bold rounded-lg bg-blue-600 text-white shadow" : "flex-1 py-1.5 text-[10px] font-bold rounded-lg text-slate-400";
-        document.getElementById('den-2').className = val == 2 ? "flex-1 py-1.5 text-[10px] font-bold rounded-lg bg-blue-600 text-white shadow" : "flex-1 py-1.5 text-[10px] font-bold rounded-lg text-slate-400";
-        renderAll();
-    }
-
-        // --- RENDER ENGINE (DESIGNER VERSION) ---
-
-    function renderAll() {
-        const container = document.getElementById('resultArea');
-        container.innerHTML = ''; 
-        container.className = "flex flex-col w-full"; // Stack day groups vertically
-
-        const days = [
-            { id: 'mwf', title: 'Mon / Wed / Fri', data: parsedData.mwf, color: 'emerald' },
-            { id: 'tth', title: 'Tue / Thu', data: parsedData.tth, color: 'amber' },
-            { id: 'sat', title: 'Saturday', data: parsedData.sat, color: 'pink' }
-        ];
-
-        days.forEach(dayGroup => {
-            if (dayGroup.data.length === 0) return;
-
-            const daySection = document.createElement('div');
-            daySection.className = "day-section w-full mb-8";
-            
-            // PC Mode = 3 columns, Designer Mode = User Choice (1 or 2)
-            const colCount = canvasSettings.mode === 'desktop' ? 3 : canvasSettings.cols;
-
-            daySection.innerHTML = `
-                <div class="flex items-center gap-2 mb-4 border-b border-white/10 pb-1">
-                    <div class="w-1.5 h-1.5 rounded-full bg-${dayGroup.color}-500"></div>
-                    <h2 class="text-[11px] font-black text-slate-300 uppercase tracking-widest">${dayGroup.title}</h2>
-                </div>
-                <div class="card-grid grid grid-cols-${colCount} gap-3 items-start"></div>
-            `;
-
-            const grid = daySection.querySelector('.card-grid');
-            dayGroup.data.forEach(c => {
-                grid.innerHTML += generateCardHTML(c, dayGroup.color);
-            });
-
-            container.appendChild(daySection);
-        });
-
-        initDragAndDrop(); 
-        syncCanvas();
-    }
-
-  function generateCardHTML(c, themeColor) {
-    const borderCol = themeColor === 'emerald' ? '#10b981' : (themeColor === 'amber' ? '#f59e0b' : '#ec4899');
-    
-    // THEME: CLEAN PAPER
-    if (currentTemplate === 'paper') {
-        return `<div draggable="true" class="card-draggable bg-white border border-gray-200 p-3 shadow-sm mb-1 text-gray-800">
-            <h4 class="font-bold text-[11px] border-b pb-1 mb-1">${c.subject}</h4>
-            <p class="text-[9px] opacity-70">${c.time} | ${c.room}</p>
-        </div>`;
-    } 
-    
-    // THEME: CYBERPUNK (This fixes the empty result)
-    if (currentTemplate === 'cyber') {
-        return `<div draggable="true" class="card-draggable bg-black border border-green-500/50 p-3 mb-1 text-green-400 font-mono">
-            <h4 class="text-[10px] font-black tracking-tighter uppercase">${c.subject}</h4>
-            <p class="text-[8px] mt-1">> ${c.time}</p>
-            <p class="text-[8px] opacity-50">LOC: ${c.room}</p>
-        </div>`;
-    }
-
-    // THEME: STEALTH DARK
-    if (currentTemplate === 'stealth') {
-        return `<div draggable="true" class="card-draggable bg-[#1a1a1a] border border-white/5 p-4 rounded-3xl mb-1 text-slate-300">
-            <h4 class="text-[11px] font-medium">${c.subject}</h4>
-            <p class="text-[9px] opacity-40 mt-1">${c.time}</p>
-        </div>`;
-    }
-
-    // THEME: SOFT ROSE
-    if (currentTemplate === 'rose') {
-        return `<div draggable="true" class="card-draggable bg-white p-4 rounded-full border border-rose-100 shadow-sm mb-1 text-center">
-            <h4 class="text-rose-500 font-bold text-[10px]">${c.subject}</h4>
-            <p class="text-rose-300 text-[8px] uppercase tracking-widest">${c.time}</p>
-        </div>`;
-    }
-
-    // THEME: MODERN PRO
-    if (currentTemplate === 'pro') {
-        return `<div draggable="true" class="card-draggable bg-white p-3 border shadow-sm mb-1 flex items-center gap-3">
-            <div class="w-1 h-10 bg-blue-600"></div>
-            <div><h4 class="text-slate-900 font-bold text-[11px]">${c.subject}</h4>
-            <p class="text-slate-500 text-[9px]">${c.time} • ${c.room}</p></div>
-        </div>`;
-    }
-
-    // DEFAULT: COSMIC GLASS
-    return `<div draggable="true" class="card-draggable glass-panel p-4 rounded-2xl border border-white/5 text-white mb-1">
-        <div class="absolute left-0 top-0 bottom-0 w-1" style="background:${borderCol}"></div>
-        <h4 class="font-bold text-[11px] leading-tight">${c.subject}</h4>
-        <div class="flex justify-between mt-2 opacity-60 text-[9px] font-mono"><span>${c.time}</span><span>${c.room}</span></div>
-    </div>`;
-}
-
-
     function initDragAndDrop() {
         const draggables = document.querySelectorAll('.card-draggable');
-        const zones = document.querySelectorAll('.card-grid'); // Drop into the grids inside days
-
-        draggables.forEach(draggable => {
-            // MOUSE
-            draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
-            draggable.addEventListener('dragend', () => draggable.classList.remove('dragging'));
-
-            // TOUCH (Mobile)
-            draggable.addEventListener('touchstart', (e) => {
-                draggable.classList.add('dragging');
-            }, { passive: true });
-            
-            draggable.addEventListener('touchend', () => {
-                draggable.classList.remove('dragging');
-            });
-
-            draggable.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const zone = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.card-grid');
-                if (zone) {
-                    const afterElement = getDragAfterElement(zone, touch.clientY);
-                    const dragging = document.querySelector('.dragging');
-                    if (afterElement == null) zone.appendChild(dragging);
-                    else zone.insertBefore(dragging, afterElement);
-                }
-            }, { passive: false });
+        const grids = document.querySelectorAll('.card-grid');
+        draggables.forEach(d => {
+            d.addEventListener('dragstart', () => d.classList.add('dragging'));
+            d.addEventListener('dragend', () => d.classList.remove('dragging'));
         });
-
-
-    grids.forEach(grid => {
-            grid.addEventListener('dragover', e => {
+        grids.forEach(g => {
+            g.addEventListener('dragover', e => {
                 e.preventDefault();
                 const draggable = document.querySelector('.dragging');
-                const afterElement = getDragAfterElement(grid, e.clientY);
-                if (afterElement == null) grid.appendChild(draggable);
-                else grid.insertBefore(draggable, afterElement);
-            });
-        });
-
-
-
-
-        zones.forEach(zone => {
-            zone.addEventListener('dragover', e => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(zone, e.clientY);
-                const dragging = document.querySelector('.dragging');
-                if (afterElement == null) zone.appendChild(dragging);
-                else zone.insertBefore(dragging, afterElement);
+                const afterElement = getDragAfterElement(g, e.clientY);
+                if (afterElement == null) g.appendChild(draggable);
+                else g.insertBefore(draggable, afterElement);
             });
         });
     }
-
-
-
-
-
-    // --- HELPER: This keeps your card designs clean and in one place ---
-    function generateCardHTML(c, dayColor = 'blue') {
-        // A. COSMIC GLASS
-        if(currentTemplate === 'cosmic') {
-            return `
-            <div draggable="true" class="card-draggable glass-panel p-5 rounded-2xl relative overflow-hidden group mb-4">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-400"></div>
-                <div class="pl-2">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">${c.edp}</span>
-                            <h4 class="font-bold text-white text-sm mt-1">${c.subject}</h4>
-                        </div>
-                        <span class="text-[10px] font-bold border border-slate-600 text-slate-400 px-1.5 py-0.5 rounded">${c.type}</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-slate-300">
-                        <span class="text-blue-300"><i class="fa-regular fa-clock"></i> ${c.time}</span>
-                        <span><i class="fa-solid fa-location-dot text-slate-500"></i> ${c.room}</span>
-                    </div>
-                </div>
-            </div>`;
-        } 
-        // B. CLEAN PAPER
-        else if(currentTemplate === 'paper') {
-            return `
-            <div draggable="true" class="card-draggable bg-white border-l-4 border-blue-500 shadow-sm p-4 rounded-lg mb-4">
-                <h4 class="font-extrabold text-gray-800 text-sm uppercase">${c.subject}</h4>
-                <div class="mt-2 flex items-center justify-between text-xs text-gray-600 font-mono">
-                    <span class="font-bold">${c.time}</span>
-                    <span class="bg-gray-100 px-2 rounded">${c.room}</span>
-                </div>
-            </div>`;
-        }
-
-        if (currentTemplate === 'cyber') {
-        return `<div draggable="true" class="card-draggable bg-black border border-green-500/50 p-3 mb-1 text-green-400 font-mono">
-            <h4 class="text-[10px] uppercase font-black tracking-tighter">${c.subject}</h4>
-            <p class="text-[8px] mt-1">> ${c.time}</p>
-            <p class="text-[8px] opacity-50">LOC: ${c.room}</p>
-        </div>`;
-    }
-        // (Add your other templates here following the same 'draggable="true"' and 'card-draggable' pattern)
-        return ''; // Fallback
-    }
-
-            // --- UTILS ---
-            function parseTime(t) {
-                let [time, mod] = t.split(/([AP]M)/i);
-                let [h, m] = time.trim().split(':').map(Number);
-                if(h === 12) h = 0; if(mod.toUpperCase() === 'PM') h += 12;
-                return h * 60 + m;
-            }
-
-    function syncCanvas() {
-        const container = document.getElementById('scheduleContainer');
-        const resultArea = document.getElementById('resultArea');
-
-        if(canvasSettings.mode === 'mobile') {
-            container.style.width = canvasSettings.width + "px";
-            container.style.paddingTop = canvasSettings.top + "px";
-            container.style.margin = "0 auto";
-            resultArea.style.zoom = canvasSettings.scale;
-            
-            // Use Scale to prevent text squeezing
-            document.querySelectorAll('.card-draggable').forEach(card => {
-                card.style.transform = `scale(${canvasSettings.scale})`;
-            });
-        } else {
-            container.style.width = "100%";
-            container.style.paddingTop = "20px";
-        }
-    }
-
-
-    function adjustCanvas(type, val) {
-        canvasSettings[type] = val;
-        const container = document.getElementById('scheduleContainer');
-        
-        if (type === 'width') container.style.width = val + "px";
-        if (type === 'top') container.style.paddingTop = val + "px";
-        
-        if (type === 'cols') {
-            // We re-render to update the grid classes
-            renderAll();
-        }
-        
-        if (type === 'scale') {
-            // Instead of scaling individual cards, we scale the whole Result Area
-            // This is much cleaner and prevents "breaking"
-            document.getElementById('resultArea').style.transform = `scale(${val})`;
-            document.getElementById('resultArea').style.transformOrigin = "top center";
-        }
-    }   
-
-    function setLayout(mode) {
-        canvasSettings.mode = mode;
-        const controls = document.getElementById('layoutControls');
-        const container = document.getElementById('scheduleContainer');
-        const btnPc = document.getElementById('btn-mode-pc');
-        const btnMob = document.getElementById('btn-mode-mobile');
-
-        if (mode === 'desktop') {
-            // --- 1. DESKTOP MODE ---
-            controls.classList.add('hidden'); // Hide sliders
-            container.style.width = "100%";
-            container.style.maxWidth = "1200px";
-            container.style.paddingTop = "20px";
-            container.style.zoom = "1";
-            
-            // Update Buttons
-            btnPc.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow";
-            btnMob.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white";
-        } else {
-            // --- 2. MOBILE DESIGNER MODE ---
-            controls.classList.remove('hidden'); // Show sliders
-            container.style.maxWidth = "none";
-            
-            // Update Buttons
-            btnMob.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow";
-            btnPc.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white";
-            
-            // Apply slider values
-            syncCanvas(); 
-        }
-        renderAll();
-    }
-
-
-
-
-
 
     function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.card-draggable:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
+        const elements = [...container.querySelectorAll('.card-draggable:not(.dragging)')];
+        return elements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
+            if (offset < 0 && offset > closest.offset) return { offset, element: child };
+            else return closest;
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-
-
-
-
-    function downloadImage() {
-    const element = document.getElementById('scheduleContainer');
-    const watermark = document.getElementById('watermark');
-    watermark.classList.remove('hidden');
-
-    const btn = document.querySelector('button[onclick="downloadImage()"]');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Capturing...`;
-
-    // Calculate current design width
-    const capWidth = canvasSettings.mode === 'mobile' ? parseInt(canvasSettings.width) : 1200;
-
-    html2canvas(element, {
-        backgroundColor: currentTemplate === 'paper' || currentTemplate === 'pro' ? '#ffffff' : (currentTemplate === 'cyber' ? '#000000' : '#030712'),
-        scale: 3, 
-        useCORS: true, 
-        allowTaint: true, 
-        width: element.offsetWidth,
-        height: element.offsetHeight,
-        onclone: (cloned) => {
-            // This forces the saved version to reset zoom so text isn't cut off
-            const root = cloned.getElementById('scheduleContainer');
-            const res = cloned.getElementById('resultArea');
-            root.style.zoom = "1";
-            root.style.width = capWidth + "px";
-            res.style.zoom = "1";
-            res.style.transform = "none";
-        }
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `UC_Schedule_${Date.now()}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        
-        btn.innerHTML = originalText;
-        watermark.classList.add('hidden');
-    });
+  function changeTheme(dept) {
+    const theme = themes[dept];
+    const root = document.documentElement;
+    
+    // 1. Update the CSS Variables (This changes the Glows and Blobs)
+    root.style.setProperty('--theme-primary', theme.primary);
+    root.style.setProperty('--theme-secondary', theme.secondary);
+    
+    // 2. Save the choice
+    localStorage.setItem('uc_theme', dept);
+    
+    // 3. Update the Generate Button glow manually for extra punch
+    const btn = document.getElementById('genBtn');
+    btn.style.boxShadow = `0 10px 30px -10px ${theme.primary}88`; // 88 is transparency
+    
+    // 4. Refresh the schedule colors
+    renderAll();
 }
 
-
-
-
-
-
-
-            function loadExample() {
-                const ex = `EDP Code Subject Type Units Days Time Room
-    41200 CC-TECHNO32 3 MWF 3:30 PM - 4:30 PM A2-404 BSIT
-    17192 IT-ELECT2 2 SAT 8:30 AM - 10:30 AM M1 BSIT
-    17200 IT-ELECT2 L 1 SAT 10:30 AM - 1:30 PM C1 BSIT
-    17128 IT-SYSADMN32 LAB 1 MWF 11:30 AM - 12:30 PM C1 BSIT`;
-                document.getElementById('rawInput').value = ex;
-            }
-
-            function switchTab(mode) {
-                const mobileView = document.getElementById('view-mobile');
-                const desktopView = document.getElementById('view-desktop');
-                const mobileBtn = document.getElementById('btn-mobile');
-                const desktopBtn = document.getElementById('btn-desktop');
-                document.getElementById('vid-mobile').pause();
-                document.getElementById('vid-desktop').pause();
-
-                if (mode === 'mobile') {
-                    mobileView.classList.remove('hidden'); desktopView.classList.add('hidden');
-                    mobileBtn.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
-                    desktopBtn.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
-                } else {
-                    desktopView.classList.remove('hidden'); mobileView.classList.add('hidden');
-                    desktopBtn.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
-                    mobileBtn.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
-                }
-            }
-
-        function toggleVideo() {
-        const modal = document.getElementById('videoModal');
-        // Try to find the inner content for animation, but don't crash if missing
-        const content = document.getElementById('modalContent'); 
-
-        // 1. If the main modal container is missing, we can't do anything.
-        if (!modal) {
-            console.error("Error: ID 'videoModal' not found in HTML.");
-            return;
-        }
-
-        if (modal.classList.contains('hidden')) {
-            // --- OPENING ---
-            modal.classList.remove('hidden');
-            
-            // Only animate if the inner box exists
-            if (content) {
-                setTimeout(() => { 
-                    content.classList.remove('scale-95', 'opacity-0'); 
-                    content.classList.add('scale-100', 'opacity-100'); 
-                }, 10);
-            }
-        } else {
-            // --- CLOSING ---
-            
-            // 1. Animate out if possible
-            if (content) {
-                content.classList.remove('scale-100', 'opacity-100'); 
-                content.classList.add('scale-95', 'opacity-0');
-            }
-            
-            // 2. Safe Video Pause (Checks if elements exist before pausing)
-            const vidMob = document.getElementById('vid-mobile');
-            const vidDesk = document.getElementById('vid-desktop');
-            if (vidMob) vidMob.pause();
-            if (vidDesk) vidDesk.pause();
-
-            // 3. Hide the modal after a short delay
-            setTimeout(() => { 
-                modal.classList.add('hidden'); 
-            }, 300);
-        }
-    }
-
-            function clearData() {
-                if(confirm("Clear your saved schedule?")) {
-                    localStorage.removeItem('uc_schedule_data');
-                    document.getElementById('rawInput').value = '';
-                    location.reload();
-                }
-            }
-
-
-
-
-
-
-
-            // --- NEW DESIGN ENGINE ---
+    function changeDensity(val) { canvasSettings.cols = val; renderAll(); }
     function openTemplateModal() { document.getElementById('templateModal').classList.remove('hidden'); }
     function closeTemplateModal() { document.getElementById('templateModal').classList.add('hidden'); }
-
-    function applyTemplate(style) {
-        currentTemplate = style;
-        closeTemplateModal();
-        // Re-render the cards with the new design
-        renderAll(); 
-        updateContainerStyle(style);
-    }
-
-    function updateContainerStyle(style) {
-        currentTemplate = style;
-        const container = document.getElementById('scheduleContainer');
-        const watermark = document.getElementById('watermark');
-
-        // Reset styles
-        container.style.backgroundImage = 'none';
-        container.style.border = '1px solid rgba(255,255,255,0.05)';
-
-        if (style === 'paper') {
-            container.style.backgroundColor = '#ffffff'; // Solid white for paper
-            watermark.className = "text-center pt-6 border-t border-gray-200 mt-4 text-[10px] text-gray-400 font-bold uppercase";
-        } else if (style === 'cyber') {
-            container.style.backgroundColor = '#000000'; // Solid black for cyber
-            container.style.border = '2px solid #22c55e';
-            watermark.className = "text-center pt-6 border-t border-green-900 mt-4 text-[10px] text-green-500 font-mono";
-        } else if (style === 'notebook') {
-            container.style.backgroundColor = '#fef9c3';
-            container.style.backgroundImage = 'linear-gradient(#e5e7eb 1px, transparent 1px)';
-            container.style.backgroundSize = '20px 20px';
-            watermark.className = "text-center pt-6 border-t border-slate-300 mt-4 text-[10px] text-slate-500 font-serif";
-        } else if (style === 'blueprint') {
-            container.style.backgroundColor = '#172554';
-            container.style.backgroundImage = 'radial-gradient(#3b82f6 1px, transparent 1px)';
-            container.style.backgroundSize = '20px 20px';
-            watermark.className = "text-center pt-6 border-t border-blue-400/30 mt-4 text-[10px] text-blue-200 font-mono";
-        } else {
-            // --- COSMIC GLASS (The Blob View) ---
-            // We use rgba 0.6 so the blue/purple blobs show through from the back
-            container.style.backgroundColor = 'rgba(3, 7, 18, 0.6)';
-            watermark.className = "text-center pt-6 border-t border-dashed border-white/10 mt-4 text-[10px] text-slate-500 font-mono uppercase";
-        }
+    function clearData() { if(confirm("Clear data?")) { localStorage.removeItem('uc_schedule_data'); location.reload(); } }
+    function toggleVideo() { document.getElementById('videoModal').classList.toggle('hidden'); }
+    function loadExample() {
+        document.getElementById('rawInput').value = `41200 CC-TECHNO32 3 MWF 3:30 PM - 4:30 PM A2-404\n17192 IT-ELECT2 2 SAT 8:30 AM - 10:30 AM M1`;
+        processSchedule();
     }
 
 
@@ -1307,6 +909,32 @@ function updateContainerStyle(style) {
 
 
 
-        </script>
+
+
+    function switchTab(mode) {
+    const vMob = document.getElementById('view-mobile');
+    const vDesk = document.getElementById('view-desktop');
+    const bMob = document.getElementById('btn-mobile');
+    const bDesk = document.getElementById('btn-desktop');
+    
+    // Pause videos when switching tabs
+    const vidMob = document.getElementById('vid-mobile');
+    const vidDesk = document.getElementById('vid-desktop');
+    if (vidMob) vidMob.pause();
+    if (vidDesk) vidDesk.pause();
+
+    if (mode === 'mobile') {
+        vMob.classList.remove('hidden');
+        vDesk.classList.add('hidden');
+        bMob.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+        bDesk.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+    } else {
+        vDesk.classList.remove('hidden');
+        vMob.classList.add('hidden');
+        bDesk.className = "glass-btn tab-active flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+        bMob.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
+    }
+}
+</script>
 </body>
 </html> 
