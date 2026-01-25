@@ -365,43 +365,156 @@
                 <h3 class="font-bold text-xl text-white">Select a Design Style</h3>
                 <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            
+
+
+
+             <!-- TANAN DESIGN -->
         <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    <!-- Cosmic -->
-    <div onclick="setDesign('cosmic')" class="cursor-pointer group">
-        <div class="bg-[#030712] border border-blue-500/50 h-32 rounded-xl flex items-center justify-center font-bold text-white group-hover:ring-2 ring-blue-500 transition">Cosmic Glass</div>
-        <p class="text-xs text-center text-slate-400 mt-2">Default Dark Mode</p>
+
+
+<!-- MARITIME THEME: THE NAVIGATOR (Blue & White Signature) -->
+<div onclick="setDesign('maritime')" class="cursor-pointer group relative overflow-hidden rounded-xl border-2 border-white bg-[#0a192f] shadow-lg hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] hover:border-[#fbbf24] transition-all duration-500">
+    
+    <!-- Background: Deep Navy -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#02040a] to-[#1e3a8a]"></div>
+    
+    <!-- STICKERS: Animated Icons -->
+    <!-- 1. Spinning Ship Wheel -->
+    <div class="absolute -top-8 -right-8 text-white/10 text-8xl group-hover:rotate-180 transition-transform duration-[1.5s]">
+        <i class="fa-solid fa-compass"></i>
     </div>
+    <!-- 2. Floating Navigation Stars -->
+    <div class="absolute top-4 left-4 text-[#fbbf24] text-xs animate-pulse">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <div class="absolute bottom-10 right-10 text-white/20 text-sm">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- 3. Waves -->
+    <div class="absolute bottom-0 left-0 w-full text-blue-300/20 text-5xl leading-none opacity-50 group-hover:-translate-y-1 transition-transform duration-1000">
+        <i class="fa-solid fa-water"></i>
+    </div>
+
+    <!-- Content -->
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
+        <!-- Main Icon: Anchor in a White Circle -->
+        <div class="mb-2 bg-white p-3 rounded-full border-4 border-[#0a192f] ring-2 ring-[#fbbf24] shadow-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-anchor text-2xl text-[#0a192f]"></i>
+        </div>
+        
+        <span class="font-black text-lg uppercase tracking-[0.2em] font-serif drop-shadow-md">Navigator</span>
+        <!-- Rank Badge -->
+        <div class="mt-1 flex items-center gap-2 bg-[#0a192f] px-3 py-1 rounded-full border border-[#fbbf24]">
+            <div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div>
+            <span class="text-[9px] text-white font-bold uppercase">Suggest Karl  Almeñana</span>
+            <div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div>
+        </div>
+    </div>
+</div>
+
+
+
+       <!-- AZURE PRO (Final Aesthetic Version) -->
+<div onclick="setDesign('azure')" class="cursor-pointer group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/50 hover:ring-2 ring-cyan-400">
+    <!-- Background: Dreamy Blue Gradient -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e40af] to-[#38bdf8]"></div>
+    
+    <!-- STICKERS: Background Decorations -->
+    <div class="absolute top-2 right-2 text-white/20 text-xl group-hover:rotate-12 transition-transform"><i class="fa-solid fa-moon"></i></div>
+    <div class="absolute bottom-2 left-2 text-white/20 text-lg group-hover:-translate-y-1 transition-transform"><i class="fa-solid fa-cloud"></i></div>
+    <div class="absolute top-1/2 right-1/4 text-white/10 text-4xl"><i class="fa-solid fa-star"></i></div>
+
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
+        <!-- Main Icon -->
+        <div class="bg-white/20 p-2 rounded-full mb-1 backdrop-blur-sm border border-white/30">
+             <i class="fa-regular fa-gem text-xl text-cyan-100 drop-shadow-md"></i>
+        </div>
+        
+        <span class="font-black text-lg tracking-wider drop-shadow-md font-sans">AZURE BLUE</span>
+        
+        <!-- Suggestor Tag (Cute Style) -->
+        <span class="text-[9px] mt-1 bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-0.5 rounded-full text-white font-bold border border-white/20 shadow-sm">
+            <i class="fa-solid fa-heart text-[8px] mr-1 text-pink-300"></i> by Shane Herbieto
+        </span>
+    </div>
+</div>
+
+
+
+
+   <!-- 1. COSMIC GLASS (Default - Polished) -->
+<div onclick="setDesign('cosmic')" class="cursor-pointer group relative overflow-hidden rounded-xl border border-blue-500/30 shadow-lg hover:shadow-blue-500/50 transition-all duration-300">
+    <div class="absolute inset-0 bg-[#030712]"></div>
+    <div class="absolute -top-10 -left-10 w-24 h-24 bg-blue-600/30 rounded-full blur-2xl group-hover:bg-purple-600/40 transition-colors"></div>
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
+        <i class="fa-solid fa-satellite text-2xl mb-2 text-slate-300 group-hover:rotate-12 transition-transform"></i>
+        <span class="font-bold text-lg tracking-wider">COSMIC</span>
+        <span class="text-[9px] text-slate-400 mt-1">Default Dark</span>
+    </div>
+</div>
     <!-- Clean Paper -->
     <div onclick="setDesign('paper')" class="cursor-pointer group">
         <div class="bg-white border border-gray-300 h-32 rounded-xl flex items-center justify-center font-bold text-gray-800 group-hover:ring-2 ring-gray-400 transition shadow-lg">Clean Paper</div>
         <p class="text-xs text-center text-slate-400 mt-2">Minimalist Light</p>
     </div>
-    <!-- Cyberpunk -->
-    <div onclick="setDesign('cyber')" class="cursor-pointer group">
-        <div class="bg-black border-2 border-green-500 h-32 flex items-center justify-center font-bold text-green-500 font-mono group-hover:shadow-[0_0_15px_#22c55e] transition">CYBERPUNK</div>
-        <p class="text-xs text-center text-slate-400 mt-2">High Contrast Neon</p>
+  <!-- CYBERPUNK (Glitch Style) -->
+<div onclick="setDesign('cyber')" class="cursor-pointer group relative overflow-hidden bg-black border border-green-800 hover:border-green-400 transition-all duration-300">
+    <!-- Scanlines -->
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-0 bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
+    
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-green-500 font-mono">
+        <i class="fa-solid fa-terminal text-2xl mb-2 group-hover:animate-pulse"></i>
+        <span class="font-bold text-lg tracking-widest uppercase group-hover:text-green-400">CYBER.SYS</span>
+        <span class="text-[9px] bg-green-900/20 px-2 py-0.5 mt-1 border border-green-500/30 group-hover:bg-green-500 group-hover:text-black transition-colors">
+            >> RUN
+        </span>
     </div>
-    <!-- Sketchbook -->
-   <div onclick="setDesign('notebook')" class="cursor-pointer group">
-    <div class="bg-[#fef9c3] h-32 rounded-xl border border-yellow-600 flex items-center justify-center text-slate-700 font-serif border-l-[20px] border-l-red-300">Sketchbook</div>
-    <p class="text-xs text-center text-slate-500 mt-2">Handwritten Style</p>
 </div>
-<div onclick="setDesign('blueprint')" class="cursor-pointer group">
-    <div class="bg-[#1e3a8a] h-32 rounded-xl border-4 border-double border-white flex items-center justify-center text-white font-mono" style="background-image: radial-gradient(white 0.5px, transparent 0.5px); background-size: 10px 10px;">Blueprint</div>
-    <p class="text-xs text-center text-slate-500 mt-2">Technical Grid</p>
+  <!-- 3. SKETCHBOOK (Hand-Drawn) -->
+<div onclick="setDesign('notebook')" class="cursor-pointer group relative overflow-hidden rounded-xl border-2 border-yellow-600/20 bg-[#fef9c3] hover:border-yellow-600 transition-all duration-300">
+    <!-- Paper Lines -->
+    <div class="absolute inset-0" style="background-image: linear-gradient(#cbd5e1 1px, transparent 1px); background-size: 100% 20px; opacity: 0.5;"></div>
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-yellow-900 font-hand rotate-1 group-hover:rotate-0 transition-transform">
+        <i class="fa-solid fa-pencil text-2xl mb-2"></i>
+        <span class="font-bold text-xl">Sketchbook</span>
+    </div>
 </div>
-<div onclick="setDesign('stealth')" class="cursor-pointer group">
-    <div class="bg-black h-32 rounded-xl border border-white/20 flex items-center justify-center text-slate-400 font-bold">Stealth Dark</div>
-    <p class="text-xs text-center text-slate-500 mt-2">Minimalist Dark</p>
+<!-- BLUEPRINT (Technical) -->
+<div onclick="setDesign('blueprint')" class="cursor-pointer group relative overflow-hidden bg-[#1e3a8a] border-2 border-white/20 hover:border-white transition-all duration-300">
+    <!-- Grid Background -->
+    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 10px 10px;"></div>
+    
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white font-mono">
+        <i class="fa-solid fa-ruler-combined text-2xl mb-2"></i>
+        <span class="font-bold text-lg uppercase border-b-2 border-white/50 pb-1">Blueprint</span>
+        <span class="text-[8px] mt-2 opacity-70">EMELIO. 2.2</span>
+    </div>
 </div>
-<div onclick="setDesign('rose')" class="cursor-pointer group">
-    <div class="bg-[#fff1f2] h-32 rounded-full border border-rose-200 flex items-center justify-center text-rose-400 font-bold">Soft Rose</div>
-    <p class="text-xs text-center text-slate-500 mt-2">Aesthetic Light</p>
+<!-- 4. STEALTH DARK (Tactical) -->
+<div onclick="setDesign('stealth')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-[#171717] border border-neutral-700 hover:border-neutral-400 transition-all duration-300">
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-neutral-400 group-hover:text-white">
+        <i class="fa-solid fa-user-secret text-2xl mb-2"></i>
+        <span class="font-bold text-lg tracking-widest uppercase">STEALTH</span>
+    </div>
 </div>
-<div onclick="setDesign('pro')" class="cursor-pointer group">
-    <div class="bg-white h-32 rounded-xl border-t-8 border-blue-600 shadow-lg flex items-center justify-center text-slate-800 font-black">Modern Pro</div>
-    <p class="text-xs text-center text-slate-500 mt-2">Clean Professional</p>
+<!-- SOFT ROSE (Aesthetic) -->
+<div onclick="setDesign('rose')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-[#fff1f2] border-2 border-transparent hover:border-pink-300 transition-all duration-300 shadow-sm hover:shadow-pink-200">
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-pink-500">
+        <i class="fa-solid fa-heart text-2xl mb-2 text-pink-300 group-hover:scale-110 transition-transform"></i>
+        <span class="font-bold text-lg font-serif italic tracking-wide">Soft Rose</span>
+        <span class="text-[9px] bg-pink-100 px-3 py-1 rounded-full mt-1 text-pink-400 font-medium group-hover:bg-pink-200">
+            <i class="fa-solid fa-ribbon text-[8px] mr-1"></i> Aesthetic
+        </span>
+    </div>
+</div>
+<!-- 5. MODERN PRO (Corporate) -->
+<div onclick="setDesign('pro')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-slate-50 border-t-4 border-indigo-600 hover:shadow-xl transition-all duration-300">
+    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-slate-700">
+        <div class="bg-indigo-100 p-2 rounded-lg mb-2 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-briefcase text-lg"></i>
+        </div>
+        <span class="font-bold text-lg">Modern Pro</span>
+    </div>
 </div>
 </div>
 
@@ -511,32 +624,122 @@
         container.className = "p-4 rounded-2xl relative overflow-hidden transition-all duration-500";
         if (blobs) blobs.style.display = 'block';
 
-        if (style === 'paper') {
-            container.style.backgroundColor = '#ffffff';
-            watermark.className = "text-center pt-6 border-t border-gray-200 mt-4 text-[10px] text-gray-400 font-bold uppercase";
-        } else if (style === 'cyber') {
-            container.style.backgroundColor = '#000000';
-            container.style.border = '2px solid #22c55e';
-            watermark.className = "text-center pt-6 border-t border-green-900 mt-4 text-[10px] text-green-500 font-mono";
-        } else if (style === 'notebook') {
-            container.style.backgroundColor = '#fef9c3';
-            container.style.backgroundImage = 'linear-gradient(#94a3b8 1px, transparent 1px)';
-            container.style.backgroundSize = '100% 25px';
-            container.style.borderLeft = '40px solid #fecaca';
-        } else if (style === 'blueprint') {
-            container.style.backgroundColor = '#172554';
-            container.style.backgroundImage = 'radial-gradient(#3b82f6 0.5px, transparent 0.5px)';
-            container.style.backgroundSize = '15px 15px';
-            container.style.border = '4px double white';
-        } else if (style === 'stealth') {
-            container.style.backgroundColor = '#0a0a0a';
-            container.style.border = '1px solid #334155';
-        } else if (style === 'rose') {
-            container.style.backgroundColor = '#fff1f2';
-        } else if (style === 'pro') {
-            container.style.backgroundColor = '#f8fafc';
-            container.style.borderTop = '10px solid #2563eb';
-        } else {
+
+// 1. COSMIC (Default) - Kept mostly same, just smoother
+    if (style === 'cosmic' || style === 'glass') {
+        container.style.backgroundColor = '#030712';
+        container.style.backgroundImage = 'radial-gradient(circle at 50% 0%, #1e1b4b 0%, #030712 60%)';
+        container.style.border = '1px solid rgba(255,255,255,0.05)';
+        watermark.className = "text-center pt-6 border-t border-white/5 mt-4 text-[10px] text-slate-500 font-mono";
+    }
+
+
+
+       // 2. CLEAN PAPER - Pure white with subtle texture
+    else if (style === 'paper') {
+        container.style.backgroundColor = '#ffffff';
+        container.style.backgroundImage = 'none';
+        container.style.border = '1px solid #e2e8f0';
+        watermark.className = "text-center pt-6 border-t border-gray-100 mt-4 text-[10px] text-gray-400 font-serif italic";
+    }else if (style === 'cyber') {
+        container.style.backgroundColor = '#000000';
+        // Matrix Grid Pattern
+        container.style.backgroundImage = `
+            linear-gradient(rgba(0, 255, 70, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 70, 0.05) 1px, transparent 1px)
+        `;
+        container.style.backgroundSize = '20px 20px';
+        container.style.border = '2px solid #22c55e';
+        container.style.boxShadow = '0 0 30px rgba(34, 197, 94, 0.2)';
+        
+        // Terminal Style Watermark
+        watermark.className = "text-center pt-6 border-t border-green-900 mt-4 text-[10px] text-green-600 font-mono";
+        // We keep the CMOB text but style it like code
+    }  // 3. SKETCHBOOK - Yellow paper with lines
+    else if (style === 'notebook') {
+        container.style.backgroundColor = '#fef9c3';
+        // Notebook lines
+        container.style.backgroundImage = 'linear-gradient(#94a3b8 1px, transparent 1px)';
+        container.style.backgroundSize = '100% 24px';
+        container.style.borderLeft = '30px solid #fca5a5'; // Red margin
+        container.style.boxShadow = '5px 5px 15px rgba(0,0,0,0.1)';
+        watermark.className = "text-center pt-6 mt-4 text-[12px] text-slate-500 font-hand rotate-1";
+    }else if (style === 'blueprint') {
+        container.style.backgroundColor = '#172554'; // Blue-950
+        // Technical Grid
+        container.style.backgroundImage = `
+            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+        `;
+        container.style.backgroundSize = '20px 20px'; // Precision Grid
+        container.style.border = '4px double white';
+        container.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+        
+        watermark.className = "text-center pt-6 border-t-2 border-white/20 mt-4 text-[10px] text-white/60 font-mono tracking-widest";
+    }  // 4. STEALTH - Matte Black/Gray
+    else if (style === 'stealth') {
+        container.style.backgroundColor = '#171717';
+        container.style.border = '1px solid #404040';
+        watermark.className = "text-center pt-6 border-t border-neutral-800 mt-4 text-[10px] text-neutral-600 font-bold uppercase tracking-[0.3em]";
+    } else if (style === 'rose') {
+        container.style.backgroundColor = '#fff1f2'; // Very light pink
+        // Polka Dot Pattern
+        container.style.backgroundImage = 'radial-gradient(#fecdd3 2px, transparent 2px)';
+        container.style.backgroundSize = '25px 25px';
+        container.style.borderRadius = '30px'; // Rounded container
+        container.style.border = '8px solid white';
+        container.style.boxShadow = '0 10px 40px rgba(244, 63, 94, 0.15)';
+        
+        watermark.className = "text-center pt-6 border-t border-pink-200 mt-4 text-[10px] text-pink-300 font-bold uppercase tracking-widest";
+    } // 5. MODERN PRO - Clean Slate
+    else if (style === 'pro') {
+        container.style.backgroundColor = '#f1f5f9';
+        container.style.borderTop = '12px solid #4f46e5'; // Indigo top bar
+        watermark.className = "text-center pt-6 border-t border-slate-200 mt-4 text-[10px] text-slate-400 font-bold uppercase";
+    }
+        
+else if (style === 'azure') {
+        // Aesthetic Grid + Blue Gradient
+        container.style.backgroundColor = '#0f172a';
+        container.style.backgroundImage = `
+            linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.9) 50%, rgba(56, 189, 248, 0.8) 100%),
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+        `;
+        container.style.backgroundSize = '100% 100%, 20px 20px, 20px 20px'; 
+        
+        container.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+        container.style.boxShadow = '0 0 50px rgba(14, 165, 233, 0.3)'; // Premium Cyan Glow
+        
+        // CMOB WATERMARK (Restored and Styled for Azure)
+        watermark.className = "text-center pt-6 border-t border-white/10 mt-4 text-[10px] text-cyan-200/70 font-bold tracking-widest uppercase drop-shadow-sm";
+    } 
+    
+    else if (style === 'maritime') {
+        // Signature Deep Navy Blue
+        container.style.backgroundColor = '#02040a';
+        
+        // Nautical Chart / Grid Pattern
+        container.style.backgroundImage = `
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.2) 0%, transparent 60%)
+        `;
+        container.style.backgroundSize = '40px 40px, 40px 40px, 100% 100%';
+        
+        // Double Border: White (Inner) + Gold (Outer)
+        container.style.border = '4px double white'; 
+        container.style.outline = '4px solid #02040a'; // Spacer
+        container.style.boxShadow = '0 0 0 6px #fbbf24, 0 20px 60px rgba(0,0,0,0.9)'; // Gold Outer Ring
+        container.style.borderRadius = '4px';
+
+        // Watermark
+        watermark.className = "text-center pt-6 border-t border-white/10 mt-4 text-[10px] text-white/50 font-bold uppercase tracking-[0.3em] font-serif";
+        watermark.innerHTML = '<i class="fa-solid fa-anchor text-[#fbbf24]"></i> POWERED BY CMOB DEPARTMENT <i class="fa-solid fa-anchor text-[#fbbf24]"></i>';
+    }
+    
+    
+    else {
             container.style.backgroundColor = 'rgba(3, 7, 18, 0.6)';
             if (blobs) blobs.style.display = 'block';
         }
@@ -547,113 +750,359 @@
     const colors = { emerald: '#10b981', amber: '#f59e0b', pink: '#ec4899' };
     const borderCol = colors[themeColor] || '#3b82f6';
     
-    // TEMPLATE 1: PAPER (Clean & Large)
+  // --- 1. CLEAN PAPER (Minimal & Sharp) ---
     if(currentTemplate === 'paper') {
-        return `<div draggable="true" class="card-draggable bg-white border-2 border-gray-100 shadow-md mb-1 text-gray-800">
-            <div class="flex justify-between items-center mb-2">
-                <span class="edp-tag" style="background:#f1f5f9; color:#1e293b; border-color:#cbd5e1">${c.edp}</span>
-                <span class="text-[10px] font-bold text-gray-400 uppercase">${c.type}</span>
+        return `
+        <div draggable="true" class="card-draggable bg-white border border-gray-200 p-4 mb-3 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all group">
+            <div class="flex justify-between items-start mb-2">
+                <span class="font-serif font-bold text-slate-800 text-[16px] leading-tight group-hover:text-black">
+                    ${c.subject}
+                </span>
+                <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded font-medium border border-gray-200">
+                    ${c.type}
+                </span>
             </div>
-            <h4 style="color:#0f172a">${c.subject}</h4>
-            <div class="mt-2 text-[12px] text-gray-500 font-medium border-t pt-2">
-                <div><i class="fa-regular fa-clock"></i> ${c.time}</div>
-                <div><i class="fa-solid fa-location-dot"></i> ${c.room}</div>
-            </div>
-        </div>`;
-    } 
+            
+            <div class="h-px bg-gray-100 w-full my-3"></div>
 
-    // TEMPLATE 2: CYBERPUNK (Neon Highlight)
+            <div class="flex justify-between text-[12px] text-gray-500 font-medium">
+                <span>${c.time}</span>
+                <span class="text-gray-800 font-bold">${c.room}</span>
+            </div>
+            <div class="mt-1 text-[9px] text-gray-300 text-right">#${c.edp}</div>
+        </div>`;
+    }
+
+   // TEMPLATE: CYBERPUNK (Premium Glitch)
     if(currentTemplate === 'cyber') {
-        return `<div draggable="true" class="card-draggable bg-black border-2 border-green-500 p-3 mb-1 text-green-400 font-cyber shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-            <div class="flex justify-between items-center mb-2">
-                <span class="edp-tag" style="border-color:#22c55e; color:#22c55e">${c.edp}</span>
-                <span class="text-[10px] font-black uppercase">>> ${c.type}</span>
+        return `
+        <div draggable="true" class="card-draggable relative overflow-hidden bg-black border border-green-600/50 mb-3 group hover:bg-green-900/10 hover:border-green-400 hover:shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all duration-200">
+            
+            <!-- Tech Deco -->
+            <div class="absolute top-0 right-0 p-1">
+                <div class="w-2 h-2 bg-green-500/50 rounded-full animate-pulse"></div>
             </div>
-            <h4 class="text-white">${c.subject}</h4>
-            <p class="text-[11px] mt-2 font-mono opacity-90">LOC: ${c.room} | ${c.time}</p>
+
+            <div class="p-4 relative z-10 font-mono">
+                <!-- Header -->
+                <div class="flex justify-between items-end mb-2 border-b border-green-800 pb-2">
+                    <span class="text-[10px] text-green-400 font-bold uppercase">>> ${c.type}</span>
+                    <span class="text-[9px] text-green-700">ID:${c.edp}</span>
+                </div>
+
+                <!-- Subject -->
+                <h4 class="text-green-300 font-bold text-[14px] leading-tight uppercase tracking-wider mb-3 group-hover:text-green-100 group-hover:shadow-[0_0_5px_rgba(34,197,94,0.8)] transition-all">
+                    ${c.subject}
+                </h4>
+
+                <!-- Data Grid -->
+                <div class="grid grid-cols-2 gap-2 text-[10px] text-green-500">
+                    <div class="bg-green-900/10 p-1 border border-green-900/50">
+                        <span class="opacity-50">T:</span> ${c.time}
+                    </div>
+                    <div class="bg-green-900/10 p-1 border border-green-900/50 text-right">
+                        <span class="opacity-50">LOC:</span> ${c.room}
+                    </div>
+                </div>
+            </div>
         </div>`;
     }
 
-    // TEMPLATE 3: SKETCHBOOK (Handwritten but Bold)
+     // --- 2. SKETCHBOOK (Handwritten Style) ---
     if(currentTemplate === 'notebook') {
-        return `<div draggable="true" class="card-draggable bg-white/60 border-b-4 border-blue-200 -rotate-1 mb-2 text-blue-900 font-hand shadow-sm">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-bold underline decoration-red-400">${c.edp}</span>
-                <span class="text-[10px] opacity-60">${c.type}</span>
+        return `
+        <div draggable="true" class="card-draggable relative bg-white/60 p-3 mb-3 border-b-2 border-slate-300 shadow-sm font-hand text-slate-800 hover:-rotate-1 transition-transform">
+             <!-- Tape Effect -->
+            <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-4 bg-yellow-200/50 rotate-2"></div>
+            
+            <div class="flex justify-between items-end mb-1">
+                <span class="text-[14px] font-black underline decoration-red-300 decoration-wavy">
+                    ${c.subject}
+                </span>
             </div>
-            <h4 class="text-blue-900 font-black">${c.subject}</h4>
-            <p class="text-[12px] mt-1">${c.time} @ ${c.room}</p>
+            
+            <div class="text-[12px] pl-2 border-l-2 border-slate-400/30 mt-2">
+                <p>⏰ ${c.time}</p>
+                <p>📍 ${c.room} <span class="text-[10px] text-slate-400">(${c.type})</span></p>
+            </div>
+            <div class="absolute bottom-1 right-2 text-[10px] opacity-50">#${c.edp}</div>
         </div>`;
     }
 
-    // TEMPLATE 4: BLUEPRINT (Technical)
+   // TEMPLATE: BLUEPRINT (Technical CAD)
     if(currentTemplate === 'blueprint') {
-        return `<div draggable="true" class="card-draggable border-2 border-white/40 bg-blue-600/20 p-3 mb-1 font-mono text-white">
-            <div class="flex justify-between mb-2">
-                <span class="edp-tag" style="background:#fff; color:#1e3a8a">${c.edp}</span>
-                <span class="text-[10px]">[${c.type}]</span>
+        return `
+        <div draggable="true" class="card-draggable bg-blue-900/80 border-2 border-white/40 p-3 mb-2 font-mono text-white relative hover:bg-blue-800 transition-colors group">
+            
+            <!-- Corner Markers (CAD Style) -->
+            <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white"></div>
+            <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-white"></div>
+            <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-white"></div>
+            <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white"></div>
+
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b border-white/20 pb-1 mb-2 border-dashed">
+                <span class="text-[10px] bg-white text-blue-900 font-bold px-1">[${c.type}]</span>
+                <span class="text-[9px] opacity-70">REF: ${c.edp}</span>
             </div>
-            <h4 class="text-white font-bold underline decoration-white/30">${c.subject}</h4>
-            <p class="text-[11px] mt-2 opacity-90">${c.time} | RM:${c.room}</p>
+
+            <!-- Subject -->
+            <h4 class="font-bold text-[13px] leading-tight mb-3 uppercase tracking-wider group-hover:underline decoration-white/50 underline-offset-4">
+                ${c.subject}
+            </h4>
+
+            <!-- Specs -->
+            <div class="flex flex-col gap-1 text-[10px] opacity-90 pl-2 border-l border-white/30">
+                <div class="flex justify-between">
+                    <span>TIME_VAL:</span> <span>${c.time}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>ROOM_ID:</span> <span>${c.room}</span>
+                </div>
+            </div>
         </div>`;
     }
 
-    // TEMPLATE 5: STEALTH DARK (High Contrast)
+   // --- 3. STEALTH DARK (Tactical / No Distractions) ---
     if(currentTemplate === 'stealth') {
-        return `<div draggable="true" class="card-draggable bg-[#111] border border-white/10 p-4 mb-1 text-slate-100 shadow-2xl">
-            <div class="flex justify-between items-center mb-2">
-                <span class="edp-tag" style="border-color:#334155; background:#000">${c.edp}</span>
-                <span class="text-[10px] font-bold text-slate-500">${c.type}</span>
+        return `
+        <div draggable="true" class="card-draggable bg-[#262626] border-l-4 border-neutral-600 p-4 mb-3 hover:bg-[#303030] hover:border-white transition-colors">
+            <div class="flex justify-between mb-2">
+                <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">EDP ${c.edp}</span>
+                <span class="text-[10px] font-bold text-neutral-400 bg-neutral-800 px-1 rounded">${c.type}</span>
             </div>
-            <h4 class="text-white">${c.subject}</h4>
-            <div class="mt-2 text-[12px] text-slate-400 flex flex-col gap-1">
-                <span><i class="fa-regular fa-clock"></i> ${c.time}</span>
-                <span><i class="fa-solid fa-location-dot"></i> ${c.room}</span>
+            
+            <h4 class="text-neutral-200 font-bold text-[14px] mb-3 font-mono">
+                ${c.subject}
+            </h4>
+
+            <div class="flex items-center justify-between text-[11px] text-neutral-400 border-t border-neutral-700 pt-2">
+                <span class="flex items-center gap-2"><i class="fa-regular fa-clock"></i> ${c.time}</span>
+                <span class="text-neutral-300 font-bold">${c.room}</span>
             </div>
         </div>`;
     }
-
-    // TEMPLATE 6: SOFT ROSE (Pill Shape)
+  // TEMPLATE: SOFT ROSE (Coquette Style)
     if(currentTemplate === 'rose') {
-        return `<div draggable="true" class="card-draggable bg-white/90 p-4 rounded-[2.5rem] border border-rose-100 shadow-sm mb-1 text-center">
-            <span class="text-[11px] font-black text-rose-300 tracking-tighter">EDP ${c.edp}</span>
-            <h4 class="text-rose-500 font-extrabold uppercase">${c.subject}</h4>
-            <p class="text-rose-400 text-[11px] font-medium italic">${c.time} • ${c.room}</p>
+        return `
+        <div draggable="true" class="card-draggable bg-white rounded-[20px] p-4 mb-3 border border-pink-100 shadow-sm hover:shadow-pink-200 hover:-translate-y-1 transition-all duration-300 group">
+            
+            <!-- Cute Ribbon Icon Decor -->
+            <div class="absolute -top-1 -right-1 text-pink-200 text-xl rotate-12 group-hover:rotate-6 transition-transform">
+                <i class="fa-solid fa-ribbon"></i>
+            </div>
+
+            <!-- Header Pill -->
+            <div class="flex justify-center mb-3">
+                <span class="bg-pink-50 text-pink-400 text-[9px] font-bold px-3 py-1 rounded-full border border-pink-100 uppercase tracking-widest">
+                    ${c.type} • ${c.edp}
+                </span>
+            </div>
+
+            <!-- Subject -->
+            <h4 class="text-center text-slate-700 font-bold text-[15px] mb-3 leading-tight group-hover:text-pink-500 transition-colors">
+                ${c.subject}
+            </h4>
+
+            <!-- Footer Info -->
+            <div class="flex justify-center gap-3 text-[11px] font-medium text-slate-500 border-t border-pink-50 pt-2">
+                <div class="flex items-center gap-1">
+                    <i class="fa-regular fa-clock text-pink-300"></i> ${c.time}
+                </div>
+                <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-location-dot text-pink-300"></i> ${c.room}
+                </div>
+            </div>
         </div>`;
     }
 
-    // TEMPLATE 7: MODERN PRO (The Sharpest Look)
+   // --- 4. MODERN PRO (Corporate / Clean) ---
     if(currentTemplate === 'pro') {
-        return `<div draggable="true" class="card-draggable bg-white p-4 border-l-8 shadow-lg mb-1 flex flex-col" style="border-left-color: ${borderCol}">
-            <div class="flex justify-between items-center mb-2">
-                <span class="edp-tag" style="background:#1e293b; border:none">${c.edp}</span>
-                <span class="text-[10px] font-black text-gray-300 uppercase">${c.type}</span>
+        const colors = { emerald: '#10b981', amber: '#f59e0b', pink: '#ec4899', blue: '#3b82f6' };
+        const accent = themeColor === 'emerald' ? 'border-emerald-500' : (themeColor === 'amber' ? 'border-amber-500' : 'border-indigo-500');
+        
+        return `
+        <div draggable="true" class="card-draggable bg-white rounded-lg shadow-sm p-4 mb-3 border-l-[6px] ${accent} hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-2">
+                <h4 class="text-slate-800 font-extrabold text-[14px] w-3/4">
+                    ${c.subject}
+                </h4>
+                <div class="text-right">
+                     <span class="block text-[9px] font-bold text-slate-400 uppercase">${c.type}</span>
+                     <span class="block text-[9px] text-slate-300">#${c.edp}</span>
+                </div>
             </div>
-            <h4 class="text-slate-900 font-black tracking-tighter">${c.subject}</h4>
-            <p class="text-slate-500 text-[12px] mt-2 font-bold uppercase"><i class="fa-regular fa-clock"></i> ${c.time} | ${c.room}</p>
+            
+            <div class="flex items-center gap-3 mt-3 text-[11px] font-semibold text-slate-600 bg-slate-50 p-2 rounded">
+                <div class="flex items-center gap-1.5 flex-1">
+                    <i class="fa-regular fa-clock text-indigo-500"></i> ${c.time}
+                </div>
+                <div class="w-px h-3 bg-slate-300"></div>
+                <div class="flex items-center gap-1.5">
+                    ${c.room}
+                </div>
+            </div>
         </div>`;
     }
 
-    // DEFAULT: POLISHED COSMIC GLASS (Based on Image 2)
-    return `
-    <div draggable="true" class="card-draggable glass-panel relative overflow-hidden flex flex-col border border-white/10 hover:border-white/20 transition-all shadow-xl">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${borderCol}; box-shadow: 0 0 15px ${borderCol}"></div>
-        
-        <div class="flex justify-between items-center mb-2">
-            <span class="edp-tag" style="background:rgba(255,255,255,0.05); border-color:${borderCol}88">${c.edp}</span>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${c.type}</span>
-        </div>
-
-        <h4 class="text-white uppercase tracking-tight">${c.subject}</h4>
-
-        <div class="mt-auto pt-3 flex flex-col gap-1.5">
-            <div class="info-text text-slate-300">
-                <i class="fa-regular fa-clock text-blue-400"></i>
-                <span>${c.time.replace('-', ' - ')}</span>
+// TEMPLATE: AZURE PRO (Aesthetic + Hover Effects)
+    if(currentTemplate === 'azure') {
+        return `
+        <div draggable="true" class="card-draggable relative overflow-hidden rounded-2xl mb-3 group transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_15px_30px_-5px_rgba(56,189,248,0.4)]"
+             style="background: linear-gradient(160deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);">
+            
+            <!-- STICKERS (With smooth hover states) -->
+            <div class="absolute -top-3 -right-3 text-cyan-300/20 text-5xl rotate-12 transition-all duration-700 group-hover:rotate-45 group-hover:text-yellow-300/40 group-hover:scale-110">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
             </div>
-            <div class="info-text text-slate-300">
-                <i class="fa-solid fa-location-dot text-slate-500"></i>
-                <span class="font-mono font-bold">${c.room}</span>
+            <div class="absolute -bottom-4 -left-2 text-white/10 text-6xl transition-all duration-700 group-hover:-translate-y-2 group-hover:text-white/20">
+                <i class="fa-solid fa-cloud"></i>
+            </div>
+
+            <!-- CONTENT LAYER -->
+            <div class="relative z-10 p-4 flex flex-col h-full">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-1.5 bg-white/20 px-2 py-1 rounded-lg border border-white/10 group-hover:bg-cyan-500/30 transition-colors">
+                        <i class="fa-solid fa-tag text-[10px] text-cyan-200"></i>
+                        <span class="text-[10px] font-bold text-white tracking-wide uppercase">${c.type}</span>
+                    </div>
+                    <span class="font-mono text-[9px] text-cyan-100 opacity-70 group-hover:opacity-100 transition-opacity">#${c.edp}</span>
+                </div>
+
+                <!-- Subject -->
+                <h4 class="text-white font-extrabold text-[15px] leading-tight tracking-wide mb-4 drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] group-hover:text-cyan-50 transition-colors">
+                    ${c.subject}
+                </h4>
+
+                <!-- Info Pills -->
+                <div class="mt-auto flex flex-col gap-2">
+                    <div class="flex items-center gap-2 bg-gradient-to-r from-blue-600/50 to-cyan-600/50 px-3 py-1.5 rounded-lg border border-white/10">
+                        <i class="fa-regular fa-clock text-cyan-300 text-[10px]"></i>
+                        <span class="text-[11px] font-bold text-white">${c.time}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 group-hover:bg-white/10 transition-colors">
+                        <i class="fa-solid fa-location-dot text-pink-400 text-[10px] group-hover:animate-bounce"></i>
+                        <span class="text-[11px] font-bold text-blue-50">${c.room}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Accent Glow -->
+            <div class="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-pink-400 via-cyan-400 to-blue-500 opacity-80 group-hover:opacity-100 group-hover:h-[4px] transition-all"></div>
+        </div>`;
+    }
+    // --- END OF AZURE CARD CODE ---
+
+// TEMPLATE: THE NAVIGATOR (Signature Blue & White)
+    if(currentTemplate === 'maritime') {
+        return `
+        <div draggable="true" class="card-draggable relative overflow-hidden rounded-md mb-3 shadow-lg group transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_30px_-5px_rgba(255,255,255,0.1)]">
+            
+            <!-- BACKGROUND: Navy Blue Body -->
+            <div class="absolute inset-0 bg-[#0a192f]"></div>
+            
+            <!-- STICKER: Faded Map/Globe in Background -->
+            <div class="absolute -right-10 top-10 text-white opacity-[0.02] text-9xl rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-1000">
+                <i class="fa-solid fa-earth-americas"></i>
+            </div>
+
+            <!-- DECOR: Gold Shoulder Stripes (Rank) -->
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 flex flex-col gap-0.5 bg-[#0a192f] border-r border-[#fbbf24]/30">
+                <div class="h-1/3 w-full bg-[#fbbf24]"></div>
+                <div class="h-1/3 w-full bg-[#fbbf24]"></div>
+                <div class="h-1/3 w-full bg-[#fbbf24]"></div>
+            </div>
+
+            <!-- CONTENT LAYER -->
+            <div class="relative z-10 flex flex-col h-full ml-2">
+                
+                <!-- TOP HEADER: Crisp White (The Hat/Shirt) -->
+                <div class="bg-white px-4 py-2 flex justify-between items-center border-b-4 border-[#fbbf24]">
+                    <div class="flex items-center gap-2">
+                         <i class="fa-solid fa-anchor text-[#0a192f] text-[12px]"></i>
+                         <span class="text-[#0a192f] text-[11px] font-black uppercase tracking-wider">UC-METC: ${c.edp}</span>
+                    </div>
+                    <!-- Type Badge -->
+                    <span class="text-[9px] font-bold bg-[#0a192f] text-white px-2 py-0.5 rounded shadow-sm">
+                        ${c.type}
+                    </span>
+                </div>
+
+                <!-- BODY: Navy Blue (The Coat) -->
+                <div class="p-4 relative">
+                    
+                    <!-- Floating Sticker: Star -->
+                    <div class="absolute top-2 right-2 text-[#fbbf24] text-[10px] animate-pulse">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <!-- Subject Title -->
+                    <h4 class="text-white font-serif font-bold text-[16px] uppercase tracking-wide leading-tight mb-4 group-hover:text-[#fbbf24] transition-colors drop-shadow-md">
+                        ${c.subject}
+                    </h4>
+
+                    <!-- Dashboard Info -->
+                    <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-3">
+                        
+                        <!-- Time (Lighthouse Icon) -->
+                        <div class="flex flex-col">
+                            <span class="text-[9px] text-gray-400 uppercase font-bold mb-0.5 tracking-wider">Watch Time</span>
+                            <div class="flex items-center gap-2 text-white text-[11px] font-mono">
+                                <i class="fa-solid fa-tower-observation text-[#fbbf24]"></i>
+                                ${c.time}
+                            </div>
+                        </div>
+
+                        <!-- Room (Ship Icon) -->
+                        <div class="flex flex-col items-end text-right">
+                            <span class="text-[9px] text-gray-400 uppercase font-bold mb-0.5 tracking-wider">Location</span>
+                            <div class="flex items-center gap-2 text-white text-[11px] font-mono font-bold">
+                                <span>${c.room}</span>
+                                <i class="fa-solid fa-ship text-sky-400"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+
+
+
+       // --- 5. COSMIC GLASS (Default - Polished) ---
+    // This return statement handles 'cosmic', 'glass', and any unknowns
+    return `
+    <div draggable="true" class="card-draggable relative overflow-hidden bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-xl p-4 mb-3 group hover:bg-slate-800/50 hover:border-white/20 transition-all shadow-lg">
+        <!-- Glow Bar on Left -->
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-purple-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+
+        <div class="pl-3">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-bold text-blue-300 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                    ${c.type}
+                </span>
+                <span class="text-[10px] text-slate-500 font-mono group-hover:text-slate-400">
+                    ${c.edp}
+                </span>
+            </div>
+
+            <h4 class="text-white font-bold text-[15px] mb-3 tracking-wide text-shadow">
+                ${c.subject}
+            </h4>
+
+            <div class="flex flex-col gap-1 text-[12px] text-slate-300 font-medium opacity-90">
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-purple-400 text-[10px]"></i>
+                    <span>${c.time}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-purple-400 text-[10px]"></i>
+                    <span>${c.room}</span>
+                </div>
             </div>
         </div>
     </div>`;
