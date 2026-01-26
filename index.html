@@ -357,170 +357,139 @@
         <i class="fa-solid fa-palette"></i>
     </button>
 
-    <!-- NEW: TEMPLATE GALLERY MODAL -->
-    <div id="templateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
-        <div class="absolute inset-0" onclick="closeTemplateModal()"></div>
-        <div class="glass w-full max-w-4xl h-[80vh] rounded-2xl flex flex-col relative z-10">
-            <div class="p-5 border-b border-white/10 flex justify-between items-center">
-                <h3 class="font-bold text-xl text-white">Select a Design Style</h3>
-                <button onclick="closeTemplateModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+   <!-- TEMPLATE GALLERY MODAL (Final Unified Version) -->
+<div id="templateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
+    <!-- Overlay Click to Close -->
+    <div class="absolute inset-0" onclick="closeTemplateModal()"></div>
+    
+    <!-- Modal Container -->
+    <div class="bg-[#0f172a] w-full max-w-6xl h-[85vh] rounded-3xl flex flex-col relative z-10 border border-slate-700 shadow-2xl overflow-hidden">
+        
+        <!-- Modal Header (Fixed) -->
+        <div class="p-5 border-b border-slate-700/50 flex justify-between items-center bg-[#020617] shrink-0 z-20">
+            <div>
+                <h3 class="font-bold text-xl text-white tracking-tight">Select a Design Style</h3>
+                <p class="text-xs text-slate-400 mt-1">Scroll to view all themes.</p>
             </div>
-
-
-
-             <!-- TANAN DESIGN -->
-        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-
-
-<!-- MARITIME THEME: THE NAVIGATOR (Blue & White Signature) -->
-<div onclick="setDesign('maritime')" class="cursor-pointer group relative overflow-hidden rounded-xl border-2 border-white bg-[#0a192f] shadow-lg hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] hover:border-[#fbbf24] transition-all duration-500">
-    
-    <!-- Background: Deep Navy -->
-    <div class="absolute inset-0 bg-gradient-to-br from-[#02040a] to-[#1e3a8a]"></div>
-    
-    <!-- STICKERS: Animated Icons -->
-    <!-- 1. Spinning Ship Wheel -->
-    <div class="absolute -top-8 -right-8 text-white/10 text-8xl group-hover:rotate-180 transition-transform duration-[1.5s]">
-        <i class="fa-solid fa-compass"></i>
-    </div>
-    <!-- 2. Floating Navigation Stars -->
-    <div class="absolute top-4 left-4 text-[#fbbf24] text-xs animate-pulse">
-        <i class="fa-solid fa-star"></i>
-    </div>
-    <div class="absolute bottom-10 right-10 text-white/20 text-sm">
-        <i class="fa-solid fa-star"></i>
-    </div>
-    <!-- 3. Waves -->
-    <div class="absolute bottom-0 left-0 w-full text-blue-300/20 text-5xl leading-none opacity-50 group-hover:-translate-y-1 transition-transform duration-1000">
-        <i class="fa-solid fa-water"></i>
-    </div>
-
-    <!-- Content -->
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
-        <!-- Main Icon: Anchor in a White Circle -->
-        <div class="mb-2 bg-white p-3 rounded-full border-4 border-[#0a192f] ring-2 ring-[#fbbf24] shadow-xl group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-anchor text-2xl text-[#0a192f]"></i>
+            <button onclick="closeTemplateModal()" class="w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-all flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
         </div>
         
-        <span class="font-black text-lg uppercase tracking-[0.2em] font-serif drop-shadow-md">Navigator</span>
-        <!-- Rank Badge -->
-        <div class="mt-1 flex items-center gap-2 bg-[#0a192f] px-3 py-1 rounded-full border border-[#fbbf24]">
-            <div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div>
-            <span class="text-[9px] text-white font-bold uppercase">Suggest Karl  Almeñana</span>
-            <div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div>
+        <!-- Modal Body (Scrollable) -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#020617] scroll-smooth">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
+
+                <!-- 1. MARITIME (Signature Blue & White) -->
+                <div onclick="setDesign('maritime')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl border-2 border-white bg-[#0a192f] shadow-lg hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] hover:border-[#fbbf24] transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#02040a] to-[#1e3a8a]"></div>
+                    <div class="absolute -top-8 -right-8 text-white/10 text-8xl group-hover:rotate-180 transition-transform duration-[1.5s]"><i class="fa-solid fa-compass"></i></div>
+                    <div class="absolute top-4 left-4 text-[#fbbf24] text-xs animate-pulse"><i class="fa-solid fa-star"></i></div>
+                    <div class="absolute bottom-10 right-10 text-white/20 text-sm"><i class="fa-solid fa-star"></i></div>
+                    <div class="absolute bottom-0 left-0 w-full text-blue-300/20 text-5xl leading-none opacity-50 group-hover:-translate-y-1 transition-transform duration-1000"><i class="fa-solid fa-water"></i></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-white">
+                        <div class="mb-2 bg-white p-2.5 rounded-full border-4 border-[#0a192f] ring-2 ring-[#fbbf24] shadow-xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-anchor text-2xl text-[#0a192f]"></i></div>
+                        <span class="font-black text-lg uppercase tracking-[0.2em] font-serif drop-shadow-md">Navigator</span>
+                        <div class="mt-1 flex items-center gap-2 bg-[#0a192f] px-3 py-1 rounded-full border border-[#fbbf24]">
+                            <div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div><span class="text-[9px] text-white font-bold uppercase">Suggest Karl Almeñana</span><div class="w-2 h-2 rounded-full bg-[#fbbf24]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. AZURE PRO (Aesthetic Blue) -->
+                <div onclick="setDesign('azure')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/50 hover:ring-2 ring-cyan-400">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e40af] to-[#38bdf8]"></div>
+                    <div class="absolute top-2 right-2 text-white/20 text-xl group-hover:rotate-12 transition-transform"><i class="fa-solid fa-moon"></i></div>
+                    <div class="absolute bottom-2 left-2 text-white/20 text-lg group-hover:-translate-y-1 transition-transform"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="absolute top-1/2 right-1/4 text-white/10 text-4xl"><i class="fa-solid fa-star"></i></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-white">
+                        <div class="bg-white/20 p-2 rounded-full mb-1 backdrop-blur-sm border border-white/30"><i class="fa-regular fa-gem text-xl text-cyan-100 drop-shadow-md"></i></div>
+                        <span class="font-black text-lg tracking-wider drop-shadow-md font-sans">AZURE BLUE</span>
+                        <span class="text-[9px] mt-1 bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-0.5 rounded-full text-white font-bold border border-white/20 shadow-sm"><i class="fa-solid fa-heart text-[8px] mr-1 text-pink-300"></i> by Shane Herbieto</span>
+                    </div>
+                </div>
+
+                <!-- 3. COSMIC GLASS (Default) -->
+                <div onclick="setDesign('cosmic')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl border border-blue-500/30 shadow-lg hover:shadow-blue-500/50 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[#030712]"></div>
+                    <div class="absolute -top-10 -left-10 w-24 h-24 bg-blue-600/30 rounded-full blur-2xl group-hover:bg-purple-600/40 transition-colors"></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-white">
+                        <i class="fa-solid fa-satellite text-2xl mb-2 text-slate-300 group-hover:rotate-12 transition-transform"></i>
+                        <span class="font-bold text-lg tracking-wider">COSMIC</span>
+                        <span class="text-[9px] text-slate-400 mt-1">Default Dark Mode</span>
+                    </div>
+                </div>
+
+                <!-- 4. CLEAN PAPER -->
+                <div onclick="setDesign('paper')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl bg-white border border-gray-300 hover:ring-2 ring-gray-400 transition shadow-lg">
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-gray-800">
+                        <i class="fa-regular fa-file-lines text-2xl mb-2 text-slate-400 group-hover:text-slate-800 transition-colors"></i>
+                        <span class="font-bold text-lg tracking-tight font-serif">Clean Paper</span>
+                        <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-widest">Minimalist Light</p>
+                    </div>
+                </div>
+
+                <!-- 5. CYBERPUNK -->
+                <div onclick="setDesign('cyber')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden bg-black border border-green-800 hover:border-green-400 transition-all duration-300 rounded-xl">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-0 bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-green-500 font-mono">
+                        <i class="fa-solid fa-terminal text-2xl mb-2 group-hover:animate-pulse"></i>
+                        <span class="font-bold text-lg tracking-widest uppercase group-hover:text-green-400">CYBER.SYS</span>
+                        <span class="text-[9px] bg-green-900/20 px-2 py-0.5 mt-1 border border-green-500/30 group-hover:bg-green-500 group-hover:text-black transition-colors">>> EXECUTE</span>
+                    </div>
+                </div>
+
+                <!-- 6. SKETCHBOOK -->
+                <div onclick="setDesign('notebook')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl border-2 border-yellow-600/20 bg-[#fef9c3] hover:border-yellow-600 transition-all duration-300">
+                    <div class="absolute inset-0" style="background-image: linear-gradient(#cbd5e1 1px, transparent 1px); background-size: 100% 20px; opacity: 0.5;"></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-yellow-900 font-hand rotate-1 group-hover:rotate-0 transition-transform">
+                        <i class="fa-solid fa-pencil text-2xl mb-2"></i>
+                        <span class="font-bold text-xl">Sketchbook</span>
+                        <span class="text-[9px] font-sans text-slate-500 mt-1">Handwritten Style</span>
+                    </div>
+                </div>
+
+                <!-- 7. BLUEPRINT -->
+                <div onclick="setDesign('blueprint')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl bg-[#1e3a8a] border-2 border-white/20 hover:border-white transition-all duration-300">
+                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 10px 10px;"></div>
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-white font-mono">
+                        <i class="fa-solid fa-ruler-combined text-2xl mb-2"></i>
+                        <span class="font-bold text-lg uppercase border-b-2 border-white/50 pb-1">Blueprint</span>
+                        <span class="text-[8px] mt-2 opacity-70">ARCH.V.2.0</span>
+                    </div>
+                </div>
+
+                <!-- 8. STEALTH -->
+                <div onclick="setDesign('stealth')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl bg-[#171717] border border-neutral-700 hover:border-neutral-400 transition-all duration-300">
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-neutral-400 group-hover:text-white">
+                        <i class="fa-solid fa-user-secret text-2xl mb-2"></i>
+                        <span class="font-bold text-lg tracking-widest uppercase">STEALTH</span>
+                        <span class="text-[9px] mt-1 opacity-50">Tactical Dark</span>
+                    </div>
+                </div>
+
+                <!-- 9. SOFT ROSE -->
+                <div onclick="setDesign('rose')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl bg-[#fff1f2] border-2 border-transparent hover:border-pink-300 transition-all duration-300 shadow-sm hover:shadow-pink-200">
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-pink-500">
+                        <i class="fa-solid fa-heart text-2xl mb-2 text-pink-300 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-lg font-serif italic tracking-wide">Soft Rose</span>
+                        <span class="text-[9px] bg-pink-100 px-3 py-1 rounded-full mt-1 text-pink-400 font-medium group-hover:bg-pink-200"><i class="fa-solid fa-ribbon text-[8px] mr-1"></i> Aesthetic</span>
+                    </div>
+                </div>
+
+                <!-- 10. MODERN PRO -->
+                <div onclick="setDesign('pro')" class="shrink-0 h-40 cursor-pointer group relative overflow-hidden rounded-xl bg-slate-50 border-t-4 border-indigo-600 hover:shadow-xl transition-all duration-300">
+                    <div class="h-full flex flex-col items-center justify-center relative z-10 text-slate-700">
+                        <div class="bg-indigo-100 p-2 rounded-lg mb-2 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i class="fa-solid fa-briefcase text-lg"></i></div>
+                        <span class="font-bold text-lg">Modern Pro</span>
+                        <span class="text-[9px] text-slate-400 mt-1">Clean Professional</span>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
-
-
-
-       <!-- AZURE PRO (Final Aesthetic Version) -->
-<div onclick="setDesign('azure')" class="cursor-pointer group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/50 hover:ring-2 ring-cyan-400">
-    <!-- Background: Dreamy Blue Gradient -->
-    <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e40af] to-[#38bdf8]"></div>
-    
-    <!-- STICKERS: Background Decorations -->
-    <div class="absolute top-2 right-2 text-white/20 text-xl group-hover:rotate-12 transition-transform"><i class="fa-solid fa-moon"></i></div>
-    <div class="absolute bottom-2 left-2 text-white/20 text-lg group-hover:-translate-y-1 transition-transform"><i class="fa-solid fa-cloud"></i></div>
-    <div class="absolute top-1/2 right-1/4 text-white/10 text-4xl"><i class="fa-solid fa-star"></i></div>
-
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
-        <!-- Main Icon -->
-        <div class="bg-white/20 p-2 rounded-full mb-1 backdrop-blur-sm border border-white/30">
-             <i class="fa-regular fa-gem text-xl text-cyan-100 drop-shadow-md"></i>
-        </div>
-        
-        <span class="font-black text-lg tracking-wider drop-shadow-md font-sans">AZURE BLUE</span>
-        
-        <!-- Suggestor Tag (Cute Style) -->
-        <span class="text-[9px] mt-1 bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-0.5 rounded-full text-white font-bold border border-white/20 shadow-sm">
-            <i class="fa-solid fa-heart text-[8px] mr-1 text-pink-300"></i> by Shane Herbieto
-        </span>
-    </div>
-</div>
-
-
-
-
-   <!-- 1. COSMIC GLASS (Default - Polished) -->
-<div onclick="setDesign('cosmic')" class="cursor-pointer group relative overflow-hidden rounded-xl border border-blue-500/30 shadow-lg hover:shadow-blue-500/50 transition-all duration-300">
-    <div class="absolute inset-0 bg-[#030712]"></div>
-    <div class="absolute -top-10 -left-10 w-24 h-24 bg-blue-600/30 rounded-full blur-2xl group-hover:bg-purple-600/40 transition-colors"></div>
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white">
-        <i class="fa-solid fa-satellite text-2xl mb-2 text-slate-300 group-hover:rotate-12 transition-transform"></i>
-        <span class="font-bold text-lg tracking-wider">COSMIC</span>
-        <span class="text-[9px] text-slate-400 mt-1">Default Dark</span>
-    </div>
-</div>
-    <!-- Clean Paper -->
-    <div onclick="setDesign('paper')" class="cursor-pointer group">
-        <div class="bg-white border border-gray-300 h-32 rounded-xl flex items-center justify-center font-bold text-gray-800 group-hover:ring-2 ring-gray-400 transition shadow-lg">Clean Paper</div>
-        <p class="text-xs text-center text-slate-400 mt-2">Minimalist Light</p>
-    </div>
-  <!-- CYBERPUNK (Glitch Style) -->
-<div onclick="setDesign('cyber')" class="cursor-pointer group relative overflow-hidden bg-black border border-green-800 hover:border-green-400 transition-all duration-300">
-    <!-- Scanlines -->
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-0 bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
-    
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-green-500 font-mono">
-        <i class="fa-solid fa-terminal text-2xl mb-2 group-hover:animate-pulse"></i>
-        <span class="font-bold text-lg tracking-widest uppercase group-hover:text-green-400">CYBER.SYS</span>
-        <span class="text-[9px] bg-green-900/20 px-2 py-0.5 mt-1 border border-green-500/30 group-hover:bg-green-500 group-hover:text-black transition-colors">
-            >> RUN
-        </span>
-    </div>
-</div>
-  <!-- 3. SKETCHBOOK (Hand-Drawn) -->
-<div onclick="setDesign('notebook')" class="cursor-pointer group relative overflow-hidden rounded-xl border-2 border-yellow-600/20 bg-[#fef9c3] hover:border-yellow-600 transition-all duration-300">
-    <!-- Paper Lines -->
-    <div class="absolute inset-0" style="background-image: linear-gradient(#cbd5e1 1px, transparent 1px); background-size: 100% 20px; opacity: 0.5;"></div>
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-yellow-900 font-hand rotate-1 group-hover:rotate-0 transition-transform">
-        <i class="fa-solid fa-pencil text-2xl mb-2"></i>
-        <span class="font-bold text-xl">Sketchbook</span>
-    </div>
-</div>
-<!-- BLUEPRINT (Technical) -->
-<div onclick="setDesign('blueprint')" class="cursor-pointer group relative overflow-hidden bg-[#1e3a8a] border-2 border-white/20 hover:border-white transition-all duration-300">
-    <!-- Grid Background -->
-    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 10px 10px;"></div>
-    
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-white font-mono">
-        <i class="fa-solid fa-ruler-combined text-2xl mb-2"></i>
-        <span class="font-bold text-lg uppercase border-b-2 border-white/50 pb-1">Blueprint</span>
-        <span class="text-[8px] mt-2 opacity-70">EMELIO. 2.2</span>
-    </div>
-</div>
-<!-- 4. STEALTH DARK (Tactical) -->
-<div onclick="setDesign('stealth')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-[#171717] border border-neutral-700 hover:border-neutral-400 transition-all duration-300">
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-neutral-400 group-hover:text-white">
-        <i class="fa-solid fa-user-secret text-2xl mb-2"></i>
-        <span class="font-bold text-lg tracking-widest uppercase">STEALTH</span>
-    </div>
-</div>
-<!-- SOFT ROSE (Aesthetic) -->
-<div onclick="setDesign('rose')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-[#fff1f2] border-2 border-transparent hover:border-pink-300 transition-all duration-300 shadow-sm hover:shadow-pink-200">
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-pink-500">
-        <i class="fa-solid fa-heart text-2xl mb-2 text-pink-300 group-hover:scale-110 transition-transform"></i>
-        <span class="font-bold text-lg font-serif italic tracking-wide">Soft Rose</span>
-        <span class="text-[9px] bg-pink-100 px-3 py-1 rounded-full mt-1 text-pink-400 font-medium group-hover:bg-pink-200">
-            <i class="fa-solid fa-ribbon text-[8px] mr-1"></i> Aesthetic
-        </span>
-    </div>
-</div>
-<!-- 5. MODERN PRO (Corporate) -->
-<div onclick="setDesign('pro')" class="cursor-pointer group relative overflow-hidden rounded-xl bg-slate-50 border-t-4 border-indigo-600 hover:shadow-xl transition-all duration-300">
-    <div class="h-32 flex flex-col items-center justify-center relative z-10 text-slate-700">
-        <div class="bg-indigo-100 p-2 rounded-lg mb-2 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-            <i class="fa-solid fa-briefcase text-lg"></i>
-        </div>
-        <span class="font-bold text-lg">Modern Pro</span>
-    </div>
-</div>
-</div>
-
-     </div>
-    </div>
-
 
 
 
@@ -1176,31 +1145,64 @@ else if (style === 'azure') {
     function downloadImage() {
         const element = document.getElementById('scheduleContainer');
         const watermark = document.getElementById('watermark');
+        
+        // 1. Show Watermark
         watermark.classList.remove('hidden');
+        
+        // 2. Loading State
         const btn = document.querySelector('button[onclick="downloadImage()"]');
         const originalText = btn.innerHTML;
         btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Capturing...`;
 
+        // 3. Calculate Dimensions
+        // We use scrollHeight to capture the FULL height, even if it goes off-screen
         const capWidth = canvasSettings.mode === 'mobile' ? parseInt(canvasSettings.width) : element.offsetWidth;
+        const capHeight = Math.max(element.scrollHeight, element.offsetHeight, 844); // Ensure at least phone height
 
         html2canvas(element, {
-            backgroundColor: currentTemplate === 'paper' || currentTemplate === 'pro' ? '#ffffff' : (currentTemplate === 'cyber' ? '#000000' : '#030712'),
-            scale: 4, useCORS: true, allowTaint: true, width: element.offsetWidth, height: element.offsetHeight,
+            // Force the background to cover the whole height
+            backgroundColor: currentTemplate === 'paper' || currentTemplate === 'pro' ? '#ffffff' : (currentTemplate === 'cyber' ? '#000000' : '#020617'),
+            
+            scale: 3, // High Quality
+            useCORS: true, 
+            allowTaint: true, 
+            
+            // CRITICAL: Force the canvas to be the full height of content
+            width: capWidth, 
+            height: capHeight,
+            windowHeight: capHeight, 
+            
             onclone: (cloned) => {
                 const root = cloned.getElementById('scheduleContainer');
                 const res = cloned.getElementById('resultArea');
-                root.style.zoom = "1"; root.style.width = capWidth + "px";
-                res.style.zoom = "1"; res.style.transform = "none";
+                
+                // Ensure the cloned container stretches fully
+                root.style.height = capHeight + "px"; 
+                root.style.minHeight = capHeight + "px";
+                
+                // Maintain Zoom
+                root.style.zoom = "1"; 
+                root.style.width = capWidth + "px";
+                
+                // Reset Transforms for clear text
+                res.style.zoom = "1"; 
+                res.style.transform = "none";
+                
+                // Text Wrapping Fix
                 cloned.querySelectorAll('.card-draggable h4').forEach(h4 => {
-                    h4.style.whiteSpace = "normal"; h4.style.overflow = "visible";
+                    h4.style.whiteSpace = "normal"; 
+                    h4.style.overflow = "visible";
                 });
             }
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `UC_Schedule_${Date.now()}.png`;
-            link.href = canvas.toDataURL("image/png",1.0);
+            link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
-            btn.innerHTML = originalText; watermark.classList.add('hidden');
+            
+            // Reset Button
+            btn.innerHTML = originalText; 
+            watermark.classList.add('hidden');
         });
     }
 
@@ -1234,59 +1236,103 @@ else if (style === 'azure') {
         } catch (e) { alert("PDF Error: " + e.message); }
     }
 
-   function processSchedule() {
-    const raw = document.getElementById('rawInput').value;
-    if (!raw.trim()) return;
+  function processSchedule() {
+    let raw = document.getElementById('rawInput').value;
+    if (!raw.trim()) { alert("Paste text first!"); return; }
+
     localStorage.setItem('uc_schedule_data', raw);
     parsedData = { mwf: [], tth: [], sat: [] };
-    
-    const cleanRaw = raw.replace(/(\d)\s+(?=\d)/g, '$1').replace(/(\w)\s*-\s*(\w)/g, '$1-$2');
-    const lines = cleanRaw.split('\n');
-    
-    lines.forEach(line => {
-        const edpMatch = line.match(/\b\d{5}\b/);
-        const timeMatch = line.match(/(\d{1,2}:\d{2}\s*[AP]M-\d{1,2}:\d{2}\s*[AP]M)/i);
+
+    // --- STEP 1: CLEAN THE WEIRD CHARACTERS ---
+    let cleanRaw = raw
+        .replace(/\t/g, ' ')
+        // 1. THIS IS THE KEY FIX: Replace the weird "Ratio" symbol with a normal Colon
+        .replace(/∶/g, ':') 
+        .replace(/：/g, ':') // Just in case full-width colon exists too
         
+        // 2. Fix Dash types
+        .replace(/–|—/g, '-')
+        
+        // 3. Fix "Stuck" Time (e.g. 1:30PM -> 1:30 PM)
+        .replace(/(\d{1,2}:\d{2})([AP]M)/gi, '$1 $2')
+        .replace(/([AP]M)-(\d)/gi, '$1 - $2')
+        
+        // 4. Collapse spaces
+        .replace(/\s+/g, ' ');
+
+    const lines = cleanRaw.split(/(?=\b\d{5}\b)/); // Split by EDP
+
+    let successCount = 0;
+
+    lines.forEach(line => {
+        line = line.trim();
+
+        // MATCH: EDP (5 digits) ... TIME (00:00 AM/PM)
+        const edpMatch = line.match(/^(\d{5})\b/);
+        // Updated Regex to be very flexible with the time format
+        const timeMatch = line.match(/(\d{1,2}:\d{2}\s*[AP]M\s*-\s*\d{1,2}:\d{2}\s*[AP]M)/i);
+
         if (edpMatch && timeMatch) {
-            const edp = edpMatch[0]; 
-            const time = timeMatch[0].toUpperCase();
-            const dayMatch = line.match(/\b(MWF|TTH|SAT|MW|TUE|THU|FRI|M|W|F|T|S|TH)\b/i);
-            const days = dayMatch ? dayMatch[0].toUpperCase() : "MWF";
-            
-            // 1. Isolate the part before the time to find the Type (LEC/LAB)
-            const partBeforeTime = line.split(time)[0].toUpperCase();
-            
-            // 2. SURGICAL TYPE DETECTION 
-            // \b means "Exact Word". This prevents "C1" or "M1" from being caught as "L"
+            const edp = edpMatch[1];
+            const time = timeMatch[0];
+
+            // DETECT DAYS
+            let days = "MWF"; 
+            if (line.match(/\b(TTH|TUE|THU|TH)\b/i)) days = "TTH";
+            else if (line.match(/\b(SAT|S)\b/i) && !line.match(/Subject|Status/i)) days = "SAT";
+            else if (line.match(/\b(MWF|MW|M|W|F)\b/i)) days = "MWF";
+
+            // DETECT TYPE
             let type = "LEC";
-            if (/\b(LAB|L|LB)\b/.test(partBeforeTime)) {
-                type = "LAB";
-            }
+            if (line.match(/\s(L|LAB|LB)\s/)) type = "LAB";
 
-            let subject = line.split(days)[0].replace(edp, '').replace(/\s*\d\s*$/, '').trim();
+            // EXTRACT SUBJECT (Between EDP and Time)
+            // We strip out the specific junk found in your log (Units "3", "2", "1")
+            let middleChunk = line.substring(5, line.indexOf(time)).trim();
             
-            // Clean subject: Remove the "L" or "LAB" word if it's stuck to the subject name
-            subject = subject.replace(/\b(LAB|L|LB|LEC)\b/gi, '').trim();
+            let subject = middleChunk
+                .replace(/\b(MWF|TTH|SAT|MW|T|TH|S)\b/gi, '') // Remove Days
+                .replace(/\b(L|LAB|LEC)\b/g, '')             // Remove Type letter
+                .replace(/\b\d\b/g, '')                      // Remove the "3", "2", "1" units
+                .replace(/\s+/g, ' ')                        // Clean spaces
+                .trim();
 
-            let room = (line.split(time)[1] || "").trim().split(/\s+/)[0] || "TBA";
-            let group = days.includes('TTH') || /^(T|TH|TUE|THU)$/.test(days) ? 'tth' : (days.includes('SAT') ? 'sat' : 'mwf');
+            // EXTRACT ROOM (After time)
+            let afterTime = line.substring(line.indexOf(time) + time.length).trim();
+            let room = afterTime.split(' ')[0] || "TBA";
+            // Ignore "BSIT" or "BSCS" if it gets picked up as a room
+            if (room.length < 2 || room === "BSIT" || room === "BSCS") room = "TBA";
 
-            parsedData[group].push({ 
-                edp, 
-                subject, 
-                time, 
-                room, 
-                type, // This is now 100% accurate
-                sort: parseTime(time.split('-')[0]) 
+            // ASSIGN
+            let group = 'mwf';
+            if (days.includes('TTH')) group = 'tth';
+            if (days.includes('SAT')) group = 'sat';
+
+            parsedData[group].push({
+                edp,
+                subject,
+                time,
+                room,
+                type,
+                sort: parseTime(time.split('-')[0])
             });
+            successCount++;
         }
     });
 
-    document.getElementById('toolbar').classList.remove('hidden');
-    document.getElementById('emptyState').classList.add('hidden');
-    document.getElementById('resultArea').classList.remove('hidden');
-    document.getElementById('fabCustomize').classList.remove('hidden');
-    setLayout('desktop');
+    if (successCount > 0) {
+        document.getElementById('toolbar').classList.remove('hidden');
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('fabCustomize').classList.remove('hidden');
+        setLayout('desktop');
+        
+        const label = document.getElementById('pdfLabel');
+        if(label) label.innerHTML = `<i class="fa-solid fa-check text-green-400"></i> Success`;
+    } else {
+        console.log("Still Failed Raw:", raw); // Keep logging just in case
+        alert("Still failing. Please check console.");
+    }
 }
 
     function parseTime(t) {
