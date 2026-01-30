@@ -131,13 +131,47 @@
 
 
 
+/* --- DENSE MODE (For long schedules) --- */
+.dense-mode .card-draggable {
+    padding: 8px 12px !important; /* Smaller padding */
+    margin-bottom: 6px !important; /* Tighter spacing */
+    min-height: 0 !important;
+}
+
+/* Shrink headers slightly in dense mode */
+.dense-mode h4 {
+    font-size: 13px !important;
+    margin-bottom: 4px !important;
+}
+
+/* Hide non-essential decorations in dense mode to save space */
+.dense-mode .fa-wand-magic-sparkles,
+.dense-mode .fa-cloud {
+    display: none !important;
+}
 
 
-
-
-
-
-
+/* --- MOBILE FRAME (Fixed: Resizable) --- */
+    .mobile-frame-active {
+        /* NO FIXED WIDTH/HEIGHT HERE - JS CONTROLS IT NOW */
+        margin: 0 auto !important;
+        border: 12px solid #1e293b;
+        border-radius: 40px !important;
+        box-shadow: 0 0 0 2px #475569, 0 30px 60px -10px rgba(0, 0, 0, 0.6);
+        overflow: hidden !important; 
+        
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        transform-origin: top center;
+        
+        /* Smooth resizing animation */
+        transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                    height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+                    
+        background-size: cover !important;
+        background-position: center !important;
+    }
 
 
 
@@ -288,35 +322,58 @@
                   
                 </div>
 
-           <!-- ADVANCED WALLPAPER DESIGNER -->
-<div id="layoutControls" class="hidden flex flex-col gap-4 w-full xl:w-auto bg-slate-900/90 p-5 rounded-3xl border border-white/10 backdrop-blur-xl mb-6">
-    <!-- 1. Layout Density -->
-    <div class="flex flex-col gap-1">
-        <label class="text-[9px] text-slate-500 uppercase font-bold">Layout Density</label>
-        <div class="flex bg-black/40 p-1 rounded-xl gap-1">
-            <button onclick="changeDensity(1)" id="den-1" class="flex-1 py-1.5 text-[10px] font-bold rounded-lg text-slate-400">List</button>
-            <button onclick="changeDensity(2)" id="den-2" class="flex-1 py-1.5 text-[10px] font-bold rounded-lg bg-blue-600 text-white shadow">Grid</button>
+  <!-- MANUAL CONTROL PANEL (Fixed & Working) -->
+<div id="layoutControls" class="hidden flex flex-col gap-4 w-full xl:w-auto bg-slate-900/95 p-5 rounded-3xl border border-white/10 backdrop-blur-xl mb-6 shadow-2xl ring-1 ring-white/10">
+    
+    <!-- HEADER -->
+    <div class="flex justify-between items-center border-b border-white/10 pb-2 mb-1">
+        <h4 class="text-xs font-bold text-white uppercase tracking-widest">
+            <i class="fa-solid fa-sliders mr-2 text-blue-400"></i>Studio Mode
+        </h4>
+        <div id="deviceTag" class="hidden text-[9px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 flex items-center gap-2">
+            <span id="deviceRes">...</span>
+            <button onclick="applyDeviceSize()" class="font-bold hover:text-white underline">FIT</button>
         </div>
     </div>
-    <!-- 2. Card Size -->
+
+    <!-- 1. LAYOUT MODE -->
     <div class="flex flex-col gap-1">
-        <label class="text-[9px] text-slate-500 uppercase font-bold">Zoom Cards</label>
-        <input type="range" min="0.5" max="1" step="0.05" value="0.9" class="cursor-pointer accent-emerald-500" oninput="adjustCanvas('scale', this.value)">
+        <label class="text-[9px] text-slate-400 uppercase font-bold">Columns</label>
+        <div class="flex bg-black/40 p-1 rounded-xl gap-1">
+            <button onclick="changeDensity(1)" id="den-1" class="flex-1 py-2 text-[10px] font-bold rounded-lg bg-blue-600 text-white shadow transition-all">1 Col</button>
+            <button onclick="changeDensity(2)" id="den-2" class="flex-1 py-2 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition-all">2 Cols</button>
+        </div>
     </div>
-    <!-- 3. Canvas Width -->
-    <div class="flex flex-col gap-1">
-        <label class="text-[9px] text-slate-500 uppercase font-bold">Wallpaper Width</label>
-        <input type="range" min="350" max="600" value="450" class="cursor-pointer accent-purple-500" oninput="adjustCanvas('width', this.value)">
+
+    <!-- 2. RESIZE (ZOOM) -->
+    <div class="flex flex-col gap-1 mt-2">
+        <div class="flex justify-between items-end">
+            <label class="text-[9px] text-slate-400 uppercase font-bold">Resize Cards</label>
+            <button onclick="autoFitContent()" class="text-[9px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30 hover:bg-indigo-500 hover:text-white transition-colors cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Auto-Calculate
+            </button>
+        </div>
+        <!-- ID ADDED: sliderScale -->
+        <input id="sliderScale" type="range" min="0.5" max="1.2" step="0.01" value="0.9" class="w-full cursor-pointer accent-blue-500 h-1 bg-slate-700 rounded-lg appearance-none" oninput="adjustCanvas('scale', this.value)">
     </div>
-    <!-- 4. Clock Space -->
+
+    <!-- 3. MOVE VERTICAL -->
     <div class="flex flex-col gap-1">
-        <label class="text-[9px] text-slate-500 uppercase font-bold">Top Space (Clock)</label>
-        <input type="range" min="0" max="300" value="80" class="cursor-pointer accent-blue-500" oninput="adjustCanvas('top', this.value)">
+        <label class="text-[9px] text-slate-400 uppercase font-bold">Move Up / Down</label>
+        <!-- ID ADDED: sliderTop -->
+        <input id="sliderTop" type="range" min="0" max="600" value="120" class="w-full cursor-pointer accent-purple-500 h-1 bg-slate-700 rounded-lg appearance-none" oninput="adjustCanvas('top', this.value)">
+    </div>
+
+    <!-- 4. MOVE HORIZONTAL (New) -->
+    <div class="flex flex-col gap-1">
+        <div class="flex justify-between">
+            <label class="text-[9px] text-slate-400 uppercase font-bold">Move Left / Right</label>
+            <button onclick="resetHorizontal()" class="text-[9px] text-slate-500 hover:text-white"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        </div>
+        <!-- ID ADDED: sliderLeft -->
+        <input id="sliderLeft" type="range" min="-150" max="150" value="0" class="w-full cursor-pointer accent-emerald-500 h-1 bg-slate-700 rounded-lg appearance-none" oninput="adjustCanvas('left', this.value)">
     </div>
 </div>
-
-
-
 
                 <!-- Download -->
                 <button onclick="downloadImage()" class="w-full xl:w-auto bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
@@ -1111,98 +1168,361 @@ else if (style === 'azure') {
         syncCanvas();
     }
 
+
+
+// --- 1. CANVAS INPUT HANDLER ---
+    function adjustCanvas(type, val) {
+        if (type === 'scale') {
+            canvasSettings.scale = parseFloat(val);
+            const label = document.getElementById('scaleVal');
+            if(label) label.innerText = Math.round(canvasSettings.scale * 100) + "%";
+        }
+        if (type === 'top') {
+            canvasSettings.top = parseInt(val);
+        }
+        if (type === 'left') {
+            canvasSettings.left = parseInt(val); // This connects the Left/Right slider
+        }
+        
+        syncCanvas();
+    }
+   function resetHorizontal() {
+        canvasSettings.left = 0;
+        document.getElementById('sliderLeft').value = 0;
+        syncCanvas();
+    }
+
+
+
+
+
+
+   // --- 2. DETECT & TRIGGER NOTIFICATION ---
+    function detectDevice() {
+        const info = identifyDevice();
+        
+        // Use Real Dimensions if on Mobile, otherwise Simulate iPhone
+        let setW = 390; 
+        let setH = 844;
+
+        if (window.innerWidth < 600) { 
+            setW = window.innerWidth;
+            setH = window.innerHeight;
+        }
+
+        // Apply to Canvas
+        canvasSettings.width = setW;
+        canvasSettings.height = setH;
+        syncCanvas();
+
+        // TRIGGER THE COOL ANIMATION
+        showSmartToast(info.brand, `${setW}px x ${setH}px`, info.dpr, info.icon);
+    }
+
+   // --- 2. AI AUTO-FIT (Calculates & Updates Sliders) ---
+    function autoFitContent() {
+        if (canvasSettings.mode !== 'mobile') return;
+
+        const containerH = canvasSettings.height;
+        const content = document.getElementById('resultArea');
+        
+        // 1. Reset transform temporarily to measure true height
+        const oldTransform = content.style.transform;
+        const oldWidth = content.style.width;
+        content.style.transform = "scale(1)";
+        content.style.width = "100%";
+        
+        const contentH = content.scrollHeight; 
+        
+        // Restore immediately so user doesn't see flicker
+        content.style.transform = oldTransform; 
+        content.style.width = oldWidth;
+
+        // 2. Calculate Scale (Max 100%, Min 65%)
+        // Buffer: 100px top + 60px bottom
+        let idealScale = (containerH - 160) / contentH;
+        
+        if (idealScale < 0.65) idealScale = 0.65; 
+        if (idealScale > 1.0) idealScale = 1.0; 
+
+        // 3. Calculate Center Position
+        const scaledContentHeight = contentH * idealScale;
+        const emptySpace = containerH - scaledContentHeight;
+        
+        let newTop = emptySpace / 2;
+        if(newTop < 80) newTop = 80; // Keep header space
+
+        // 4. APPLY TO SYSTEM
+        canvasSettings.scale = idealScale;
+        canvasSettings.top = newTop;
+        canvasSettings.left = 0; // Reset horizontal on auto-fit
+
+        syncCanvas();
+        
+        // 5. UPDATE SLIDER UI (The Fix)
+        // Now using IDs so it definitely finds the sliders
+        document.getElementById('sliderScale').value = idealScale;
+        document.getElementById('sliderTop').value = newTop;
+        document.getElementById('sliderLeft').value = 0;
+        
+        showToast("AI Assistant", "Calculated best fit. Tweak if needed!", "fa-robot");
+    }
+
+
+
+   // --- 2. DETECT & TRIGGER NOTIFICATION ---
+    function detectDevice() {
+        const info = identifyDevice();
+        
+        // Use Real Dimensions if on Mobile, otherwise Simulate iPhone
+        let setW = 390; 
+        let setH = 844;
+
+        if (window.innerWidth < 600) { 
+            setW = window.innerWidth;
+            setH = window.innerHeight;
+        }
+
+        // Apply to Canvas
+        canvasSettings.width = setW;
+        canvasSettings.height = setH;
+        syncCanvas();
+
+        // TRIGGER THE COOL ANIMATION
+        showSmartToast(info.brand, `${setW}px x ${setH}px`, info.dpr, info.icon);
+    }
+    // --- 2. DETECT & TRIGGER NOTIFICATION ---
+    function detectDevice() {
+        const info = identifyDevice();
+        
+        // Use Real Dimensions if on Mobile, otherwise Simulate iPhone
+        let setW = 390; 
+        let setH = 844;
+
+        if (window.innerWidth < 600) { 
+            setW = window.innerWidth;
+            setH = window.innerHeight;
+        }
+
+        // Apply to Canvas
+        canvasSettings.width = setW;
+        canvasSettings.height = setH;
+        syncCanvas();
+
+        // TRIGGER THE COOL ANIMATION
+        showSmartToast(info.brand, `${setW}px x ${setH}px`, info.dpr, info.icon);
+    }
+
+// --- NEW: INTELLIGENT DEVICE IDENTIFIER ---
+ // --- 4. DEVICE DETECTION & NOTIFICATION SYSTEM ---
+    
+  function detectDevice() {
+        const info = identifyDevice();
+        let w = 390, h = 844;
+
+        if (window.innerWidth < 600) { 
+            w = window.innerWidth; h = window.innerHeight; // Real Mobile
+        }
+
+        canvasSettings.width = w;
+        canvasSettings.height = h;
+        syncCanvas();
+
+        showSmartToast(info.brand, `${w}px x ${h}px`, info.dpr, info.icon);
+    }
+// --- CENTER CONTENT BUTTON (No Resizing) ---
+    function centerContent() {
+        if (canvasSettings.mode !== 'mobile') return;
+
+        const containerH = canvasSettings.height;
+        const content = document.getElementById('resultArea');
+        
+        // 1. Get current content height (considering current scale)
+        // We use scrollHeight * scale to get the visual height
+        const currentHeight = content.scrollHeight * canvasSettings.scale;
+        
+        // 2. Calculate Empty Space
+        const emptySpace = containerH - currentHeight;
+        
+        // 3. Center it (Half the empty space)
+        let newTop = emptySpace / 2;
+        
+        // Safety: Don't go off the top edge
+        if(newTop < 50) newTop = 50;
+
+        // 4. Apply Position
+        adjustCanvas('top', newTop);
+        document.querySelector('input[oninput*="top"]').value = newTop;
+        
+        showToast("Position Updated", "Content Centered", "fa-arrows-up-down");
+    }
+
     // --- 5. SYSTEM LOGIC ---
+  // --- 1. LAYOUT MANAGER (Initialize New Settings) ---
     function setLayout(mode) {
         canvasSettings.mode = mode;
         const ctrls = document.getElementById('layoutControls');
         const container = document.getElementById('scheduleContainer');
+        const mobileBtn = document.getElementById('btn-mode-mobile');
+        const pcBtn = document.getElementById('btn-mode-pc');
+        const deviceTag = document.getElementById('deviceTag');
+
         if (mode === 'desktop') {
             ctrls.classList.add('hidden');
-            container.style.width = "100%"; container.style.maxWidth = "1200px";
-            container.style.paddingTop = "20px"; document.getElementById('resultArea').style.zoom = "1";
+            container.classList.remove('mobile-frame-active');
+            container.style = "";
+            container.className = "p-4 rounded-2xl relative overflow-hidden transition-all duration-500";
+            document.getElementById('resultArea').style.transform = "scale(1)";
+            changeDensity(3);
+            pcBtn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow transition-all";
+            mobileBtn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition-all";
         } else {
-            ctrls.classList.remove('hidden'); container.style.maxWidth = "none"; syncCanvas();
+            ctrls.classList.remove('hidden');
+            container.classList.add('mobile-frame-active');
+            
+            if(deviceTag) {
+                deviceTag.classList.remove('hidden');
+                document.getElementById('deviceRes').innerText = `${window.screen.width}x${window.screen.height}`;
+            }
+
+            if(!canvasSettings.width || canvasSettings.width > 600) {
+                canvasSettings.width = 390; canvasSettings.height = 844;
+            }
+            
+            detectDevice(); 
+            changeDensity(1);
+            
+            // RESET ALL SETTINGS FOR MOBILE
+            canvasSettings.scale = 0.85;
+            canvasSettings.top = 120;
+            canvasSettings.left = 0; // Reset horizontal
+            
+            // Sync Slider UI
+            document.querySelector('input[oninput*="scale"]').value = 0.85;
+            document.querySelector('input[oninput*="top"]').value = 120;
+            const xSlider = document.getElementById('xSlider');
+            if(xSlider) xSlider.value = 0;
+            
+            syncCanvas();
+            mobileBtn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow transition-all";
+            pcBtn.className = "flex-1 px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition-all";
         }
+        updateContainerStyle(currentTemplate);
         renderAll();
     }
 
-    function adjustCanvas(type, val) {
-        canvasSettings[type] = val;
-        if (type === 'cols') renderAll();
-        else syncCanvas();
-    }
+      // --- 3. AI AUTO-FIT (Calculates & Updates Sliders) ---
+    function autoFitContent() {
+        if (canvasSettings.mode !== 'mobile') return;
 
+        const containerH = canvasSettings.height;
+        const content = document.getElementById('resultArea');
+        
+        // Measure True Height
+        const oldTransform = content.style.transform;
+        const oldWidth = content.style.width;
+        content.style.transform = "scale(1)";
+        content.style.width = "100%";
+        const contentH = content.scrollHeight; 
+        content.style.transform = oldTransform; 
+        content.style.width = oldWidth;
+
+        // Calculate Scale
+        let idealScale = (containerH - 160) / contentH;
+        if (idealScale < 0.65) idealScale = 0.65; 
+        if (idealScale > 1.0) idealScale = 1.0; 
+
+        // Calculate Vertical Center
+        const scaledContentHeight = contentH * idealScale;
+        const emptySpace = containerH - scaledContentHeight;
+        let newTop = emptySpace / 2;
+        if(newTop < 80) newTop = 80; 
+
+        // APPLY
+        canvasSettings.scale = idealScale;
+        canvasSettings.top = newTop;
+        canvasSettings.left = 0; 
+
+        syncCanvas();
+        
+        // UPDATE SLIDER UI (This fixes the "Auto-Fit not working" bug)
+        document.getElementById('sliderScale').value = idealScale;
+        document.getElementById('sliderTop').value = newTop;
+        document.getElementById('sliderLeft').value = 0;
+        
+        showSmartToast("AI Assistant", "Calculated best fit. Tweak if needed!", "1.0", "fa-wand-magic-sparkles");
+    }
+    // --- 2. CANVAS SYNC (Applies Visuals) ---
     function syncCanvas() {
+        if (canvasSettings.mode !== 'mobile') return;
+        
         const container = document.getElementById('scheduleContainer');
-        if (canvasSettings.mode === 'mobile') {
-            container.style.width = canvasSettings.width + "px";
-            container.style.paddingTop = canvasSettings.top + "px";
-            container.style.margin = "0 auto";
-            document.getElementById('resultArea').style.zoom = canvasSettings.scale;
-        }
-    }
+        const resultArea = document.getElementById('resultArea');
+        
+        // 1. Lock Container Size
+        container.style.width = canvasSettings.width + "px";
+        container.style.height = canvasSettings.height + "px";
+        container.style.minHeight = canvasSettings.height + "px";
+        
+        // 2. Apply Vertical Move (Padding)
+        container.style.paddingTop = canvasSettings.top + "px";
 
+        // 3. Smart Margins
+        let sideMargin = 20; 
+        if(canvasSettings.scale <= 0.75) sideMargin = 5;
+        container.style.paddingLeft = sideMargin + "px";
+        container.style.paddingRight = sideMargin + "px";
+
+        // 4. THE TRANSFORM MAGIC (Scale + Move Left/Right)
+        const s = parseFloat(canvasSettings.scale) || 1;
+        const x = parseInt(canvasSettings.left) || 0; // Get the X value
+        
+        resultArea.style.transform = `scale(${s}) translateX(${x}px)`;
+        
+        // 5. Width Correction
+        resultArea.style.width = `${100 / s}%`;
+        resultArea.style.transformOrigin = "top center"; 
+    }
+  // --- 4. DOWNLOADER (FIXED) ---
     function downloadImage() {
         const element = document.getElementById('scheduleContainer');
         const watermark = document.getElementById('watermark');
-        
-        // 1. Show Watermark
-        watermark.classList.remove('hidden');
-        
-        // 2. Loading State
         const btn = document.querySelector('button[onclick="downloadImage()"]');
         const originalText = btn.innerHTML;
-        btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Capturing...`;
+        
+        btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Saving...`;
+        watermark.classList.remove('hidden');
 
-        // 3. Calculate Dimensions
-        // We use scrollHeight to capture the FULL height, even if it goes off-screen
-        const capWidth = canvasSettings.mode === 'mobile' ? parseInt(canvasSettings.width) : element.offsetWidth;
-        const capHeight = Math.max(element.scrollHeight, element.offsetHeight, 844); // Ensure at least phone height
+        let scale = 3;
+        let outputWidth = element.offsetWidth;
+        let outputHeight = element.offsetHeight;
+
+        if (canvasSettings.mode === 'mobile') {
+            // Force 1080p width quality
+            scale = 1080 / element.offsetWidth; 
+        }
 
         html2canvas(element, {
-            // Force the background to cover the whole height
-            backgroundColor: currentTemplate === 'paper' || currentTemplate === 'pro' ? '#ffffff' : (currentTemplate === 'cyber' ? '#000000' : '#020617'),
-            
-            scale: 3, // High Quality
-            useCORS: true, 
-            allowTaint: true, 
-            
-            // CRITICAL: Force the canvas to be the full height of content
-            width: capWidth, 
-            height: capHeight,
-            windowHeight: capHeight, 
-            
+            scale: scale, useCORS: true, allowTaint: true,
+            backgroundColor: null,
+            width: outputWidth, height: outputHeight,
             onclone: (cloned) => {
-                const root = cloned.getElementById('scheduleContainer');
-                const res = cloned.getElementById('resultArea');
-                
-                // Ensure the cloned container stretches fully
-                root.style.height = capHeight + "px"; 
-                root.style.minHeight = capHeight + "px";
-                
-                // Maintain Zoom
-                root.style.zoom = "1"; 
-                root.style.width = capWidth + "px";
-                
-                // Reset Transforms for clear text
-                res.style.zoom = "1"; 
-                res.style.transform = "none";
-                
-                // Text Wrapping Fix
-                cloned.querySelectorAll('.card-draggable h4').forEach(h4 => {
-                    h4.style.whiteSpace = "normal"; 
-                    h4.style.overflow = "visible";
-                });
+                const cContainer = cloned.getElementById('scheduleContainer');
+                if (canvasSettings.mode === 'mobile') {
+                    // Remove phone border for saved image
+                    cContainer.style.border = "none";
+                    cContainer.style.borderRadius = "0";
+                    cContainer.style.boxShadow = "none";
+                    cContainer.style.height = outputHeight + "px";
+                }
+                cloned.querySelectorAll('h4').forEach(h => { h.style.whiteSpace = "normal"; h.style.overflow = "visible"; });
             }
         }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `UC_Schedule_${Date.now()}.png`;
+            link.download = `Schedule_${Date.now()}.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
-            
-            // Reset Button
-            btn.innerHTML = originalText; 
-            watermark.classList.add('hidden');
+            btn.innerHTML = originalText; watermark.classList.add('hidden');
         });
     }
 
@@ -1430,6 +1750,145 @@ else if (style === 'azure') {
         bMob.className = "glass-btn tab-inactive flex-1 py-3 text-sm font-bold rounded-lg transition-all";
     }
 }
+
+
+
+
+// --- 1. INTELLIGENT DEVICE DETECTOR (The "Brain") ---
+    function identifyDevice() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        // Get Screen Resolution
+        const width = window.screen.width;
+        const height = window.screen.height;
+        const dpr = window.devicePixelRatio ? window.devicePixelRatio.toFixed(1) : "1.0";
+        
+        let brand = "Unknown Device";
+        let icon = "fa-mobile-screen"; 
+
+        // Detect Brand based on browser signature
+        if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+            brand = "Apple iPhone";
+            icon = "fa-apple";
+        } 
+        else if (/android/i.test(ua)) {
+            icon = "fa-android";
+            if (/samsung|SM-|GT-/i.test(ua)) brand = "Samsung Galaxy";
+            else if (/pixel/i.test(ua)) brand = "Google Pixel";
+            else if (/huawei|honor/i.test(ua)) brand = "Huawei Device";
+            else if (/xiaomi|mi |redmi/i.test(ua)) brand = "Xiaomi / Redmi";
+            else if (/oppo/i.test(ua)) brand = "OPPO Device";
+            else if (/vivo/i.test(ua)) brand = "Vivo Device";
+            else brand = "Android Device";
+        }
+        else if (/Macintosh/.test(ua)) {
+            brand = "Mac Desktop";
+            icon = "fa-laptop";
+        }
+        else if (/Windows/.test(ua)) {
+            brand = "Windows PC";
+            icon = "fa-desktop";
+        }
+
+        return { brand, width, height, dpr, icon };
+    }
+
+
+
+
+
+// --- 2. DETECT & ANIMATE (The Trigger) ---
+    function detectDevice() {
+        const info = identifyDevice();
+        
+        // Logic: If on PC (Screen > 600px), Simulate iPhone. 
+        // If on Real Mobile, use Real Size.
+        let setW = 390; 
+        let setH = 844;
+
+        if (window.innerWidth < 600) { 
+            setW = window.innerWidth;
+            setH = window.innerHeight;
+        }
+
+        // Apply to Canvas
+        canvasSettings.width = setW;
+        canvasSettings.height = setH;
+        syncCanvas();
+
+        // TRIGGER THE COOL POPUP
+        showSmartToast(info.brand, `${setW}px x ${setH}px`, info.dpr, info.icon);
+    }
+
+    // --- 3. HUD NOTIFICATION UI (The Visuals) ---
+    function showSmartToast(brand, res, dpr, iconClass) {
+        const t = document.getElementById('smartToast');
+        const bar = document.getElementById('toastBar');
+        if(!t) return; // Safety check
+
+        // 1. Update Text
+        document.getElementById('toastBrand').innerText = brand;
+        document.getElementById('toastRes').innerText = res;
+        document.getElementById('toastDPI').innerText = `${dpr} Density`;
+        
+        // 2. Update Icon (Handle Brands vs Solid icons)
+        const iconEl = document.getElementById('toastIcon');
+        if (iconClass.includes('apple') || iconClass.includes('android')) {
+            iconEl.className = `fa-brands ${iconClass} text-blue-400 text-xl`;
+        } else {
+            iconEl.className = `fa-solid ${iconClass} text-blue-400 text-xl`;
+        }
+        
+        // 3. Animate In
+        t.classList.remove('-translate-y-40', 'opacity-0');
+        
+        // 4. Loading Bar Animation
+        if(bar) {
+            bar.style.width = "0%";
+            bar.style.transition = "none";
+            setTimeout(() => {
+                bar.style.transition = "width 3s linear"; 
+                bar.style.width = "100%"; 
+            }, 100);
+        }
+
+        // 5. Animate Out (After 3.5s)
+        setTimeout(() => {
+            t.classList.add('-translate-y-40', 'opacity-0');
+            if(bar) setTimeout(() => { bar.style.width = "0%"; }, 500); 
+        }, 3500);
+    }
 </script>
+
+<!-- ADVANCED HUD NOTIFICATION (The Cool Popup) -->
+<div id="smartToast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col bg-[#0f172a]/95 border border-blue-500/40 text-white rounded-2xl shadow-[0_0_50px_rgba(59,130,246,0.5)] backdrop-blur-xl transform -translate-y-40 opacity-0 transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) pointer-events-none min-w-[300px] overflow-hidden">
+    
+    <!-- Top Row: Icon & Text -->
+    <div class="flex items-center gap-4 px-6 py-4">
+        <!-- Animated Icon Container -->
+        <div class="relative">
+            <div class="absolute inset-0 bg-blue-500 blur-xl opacity-50 animate-pulse"></div>
+            <div class="relative w-12 h-12 rounded-full bg-gradient-to-b from-slate-700 to-slate-900 border border-slate-500 flex items-center justify-center shadow-inner">
+                <i id="toastIcon" class="fa-solid fa-mobile-screen text-blue-400 text-xl filter drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]"></i>
+            </div>
+        </div>
+        
+        <!-- Text Info -->
+        <div class="flex flex-col">
+            <span class="text-[10px] text-blue-300 font-bold tracking-widest uppercase mb-0.5">System Detection</span>
+            <span id="toastBrand" class="text-sm font-extrabold text-white tracking-wide font-sans">Scanning...</span>
+            <div class="flex items-center gap-2 mt-1">
+                <span id="toastRes" class="text-[10px] text-white font-mono bg-blue-600/30 px-2 py-0.5 rounded border border-blue-500/30 shadow-sm">0x0</span>
+                <span id="toastDPI" class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">@1x Density</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Loading Bar -->
+    <div class="h-1 w-full bg-slate-800">
+        <div id="toastBar" class="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-white w-0 shadow-[0_0_10px_#22d3ee]"></div>
+    </div>
+</div>
+
+</div>
 </body>
 </html> 
