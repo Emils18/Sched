@@ -231,6 +231,29 @@
                     Study Load <br> <span class="text-gradient header-glow">Sorter AI</span>
                 </h1>
                 <p class="text-slate-400 font-light text-lg">Paste text. Choose design. Save image.</p>
+
+
+<!-- LIVE STATS HUD -->
+<div class="flex flex-wrap gap-3 mt-4 animate-fade-in">
+    <!-- Live Users -->
+    <div class="flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-full backdrop-blur-md">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+        </span>
+        <span id="headerOnlineCount" class="text-xs font-bold text-green-400 font-mono tracking-wider">0 ACTIVE USERS</span>
+    </div>
+
+    <!-- Total Visitors -->
+    <div class="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full backdrop-blur-md">
+        <i class="fa-solid fa-eye text-blue-400 text-xs"></i>
+        <span id="headerVisitCount" class="text-xs font-bold text-blue-300 font-mono tracking-wider">0 VISITS</span>
+    </div>
+</div>
+
+
+                
+
             </div>
             
 <!-- PDF UPLOAD BUTTON -->
@@ -240,6 +263,11 @@
                 <input type="file" id="pdfUpload" accept=".pdf" class="hidden" onchange="handlePDF(this)">
             </label>
 
+<!-- LEADERBOARD BUTTON -->
+<button onclick="openLeaderboard()" class="glass-btn px-5 py-3 rounded-full flex items-center gap-2 group border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition-all">
+    <i class="fa-solid fa-trophy text-yellow-300 animate-pulse"></i>
+    <span class="text-sm font-bold tracking-wide">Rankings</span>
+</button>
 
 
             <div class="flex gap-3">
@@ -1649,6 +1677,7 @@ else if (style === 'azure') {
         
         const label = document.getElementById('pdfLabel');
         if(label) label.innerHTML = `<i class="fa-solid fa-check text-green-400"></i> Success`;
+         if(window.addRankPoint) window.addRankPoint();
     } else {
         console.log("Still Failed Raw:", raw); // Keep logging just in case
         alert("Still failing. Please check console.");
@@ -1888,6 +1917,238 @@ else if (style === 'azure') {
         <div id="toastBar" class="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-white w-0 shadow-[0_0_10px_#22d3ee]"></div>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- LEADERBOARD MODAL -->
+<div id="leaderboardModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
+    <div class="absolute inset-0" onclick="closeLeaderboard()"></div>
+    
+    <div class="bg-[#0f172a] w-full max-w-md rounded-3xl flex flex-col relative z-10 border border-slate-700 shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-700/50 flex justify-between items-center bg-[#020617]">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/50">
+                    <i class="fa-solid fa-crown text-yellow-400 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-white">Top Users</h3>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        <p id="activeUserCount" class="text-[10px] text-green-400 font-mono font-bold tracking-widest uppercase">0 ONLINE</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeLeaderboard()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            <!-- Registration Form (Only shows if new user) -->
+            <div id="registerArea" class="mb-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl">
+                <label class="text-[10px] uppercase font-bold text-blue-300 mb-2 block">Set Your Codename to Join</label>
+                <div class="flex gap-2">
+                    <input type="text" id="usernameInput" placeholder="Ex: CAPTAIN_A" maxlength="10" class="bg-slate-900 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 focus:border-blue-500 outline-none font-bold uppercase tracking-wider">
+                    <button onclick="window.registerUser()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-xs uppercase">Save</button>
+                </div>
+            </div>
+
+            <!-- The List -->
+            <div class="flex flex-col gap-2" id="leaderboardList">
+                <div class="text-center py-8 opacity-50"><i class="fa-solid fa-spinner animate-spin"></i> Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- DATABASEEEEEEEEEEEEEEEEE -->
+
+<script type="module">
+    // 1. IMPORT FIREBASE (Added runTransaction for Visitor Count)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, update, onDisconnect, increment, query, orderByChild, limitToLast, runTransaction } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // 2. CONFIGURATION
+    const firebaseConfig = {
+        // --- PASTE YOUR REAL KEYS HERE ---
+        apiKey: "AIzaSy.....", 
+        authDomain: "uc-schedule-sorter.firebaseapp.com",
+        databaseURL: "https://uc-schedule-sorter-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "uc-schedule-sorter",
+        storageBucket: "uc-schedule-sorter.appspot.com",
+        messagingSenderId: "...",
+        appId: "..."
+        // ----------------------------------
+    };
+
+    // 3. START APP
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ==========================================
+    // A. TOTAL VISITOR COUNTER (Persistent)
+    // ==========================================
+    const visitsRef = ref(db, "status/totalVisits");
+
+    // 1. Increment Counter safely (Runs once per load)
+    runTransaction(visitsRef, (currentData) => {
+        return (currentData || 0) + 1;
+    });
+
+    // 2. Display Total Visits in Header
+    onValue(visitsRef, (snap) => {
+        const visits = snap.val() || 0;
+        const el = document.getElementById("headerVisitCount");
+        if(el) el.innerText = visits.toLocaleString() + " VISITS";
+    });
+
+    // ==========================================
+    // B. LIVE USER TRACKING (Real-time)
+    // ==========================================
+    const connectedRef = ref(db, ".info/connected");
+    const onlineRef = ref(db, "status/connections");
+    
+    function getMyDeviceInfo() {
+        const ua = navigator.userAgent;
+        let device = "Desktop PC";
+        if (/iPhone/.test(ua)) device = "iPhone";
+        else if (/iPad/.test(ua)) device = "iPad";
+        else if (/Samsung|SM-|GT-/i.test(ua)) device = "Samsung";
+        else if (/Android/.test(ua)) device = "Android";
+        
+        return {
+            brand: device,
+            resolution: `${window.screen.width}x${window.screen.height}`
+        };
+    }
+
+    onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+            const myPresence = ref(db, "status/connections/" + Date.now());
+            const info = getMyDeviceInfo();
+
+            set(myPresence, {
+                brand: info.brand,
+                screen: info.resolution,
+                state: "online"
+            });
+
+            onDisconnect(myPresence).remove();
+        }
+    });
+
+    // UPDATE LIVE COUNTS (Header & Modal)
+    onValue(onlineRef, (snap) => {
+        const count = snap.size || 0;
+        
+        // 1. Update Leaderboard Modal
+        const elModal = document.getElementById("activeUserCount");
+        if(elModal) elModal.innerText = count + " ONLINE";
+
+        // 2. Update Main Header
+        const elHeader = document.getElementById("headerOnlineCount");
+        if(elHeader) elHeader.innerText = count + " LIVE";
+    });
+
+    // ==========================================
+    // C. LEADERBOARD LOGIC
+    // ==========================================
+    
+    // Auto-hide register if already done
+    const myName = localStorage.getItem("uc_sorter_name");
+    if(myName) {
+        const regArea = document.getElementById("registerArea");
+        if(regArea) regArea.classList.add("hidden");
+    }
+
+    // Register Function
+    window.registerUser = function() {
+        const nameInput = document.getElementById("usernameInput").value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if(nameInput.length < 3) { alert("Name too short! 3 chars min."); return; }
+        
+        localStorage.setItem("uc_sorter_name", nameInput);
+        
+        update(ref(db, "users/" + nameInput), {
+            name: nameInput,
+            lastActive: Date.now()
+        });
+        
+        document.getElementById("registerArea").classList.add("hidden");
+        alert("Registered as " + nameInput);
+    };
+
+    // Add Point Function (Connected to Generate button)
+    window.addRankPoint = function() {
+        const name = localStorage.getItem("uc_sorter_name");
+        if(name) {
+            const userRef = ref(db, "users/" + name);
+            update(userRef, {
+                score: increment(1),
+                lastActive: Date.now()
+            });
+        }
+    };
+
+    // Render Leaderboard List
+    const topUsers = query(ref(db, "users"), orderByChild("score"), limitToLast(10));
+    
+    onValue(topUsers, (snapshot) => {
+        const list = document.getElementById("leaderboardList");
+        if(!list) return;
+        
+        list.innerHTML = "";
+        let data = [];
+        
+        snapshot.forEach((child) => {
+            data.push(child.val());
+        });
+        
+        data.reverse(); 
+
+        data.forEach((u, i) => {
+            let color = "text-slate-400";
+            let icon = `<span class="font-mono opacity-50">#${i+1}</span>`;
+            let bg = "bg-slate-800/50";
+            
+            if(i===0) { color="text-yellow-400"; icon="👑"; bg="bg-yellow-500/10 border-yellow-500/30"; }
+            if(i===1) { color="text-slate-300"; icon="🥈"; }
+            if(i===2) { color="text-amber-600"; icon="🥉"; }
+
+            list.innerHTML += `
+            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-700/50 ${bg}">
+                <div class="flex items-center gap-3">
+                    <div class="w-6 text-center font-bold ${color}">${icon}</div>
+                    <span class="font-bold text-white tracking-wide text-xs">${u.name}</span>
+                </div>
+                <div class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded text-[10px] border border-slate-700">
+                    <i class="fa-solid fa-bolt text-blue-400"></i>
+                    <span class="text-blue-200 font-mono">${u.score || 0}</span>
+                </div>
+            </div>`;
+        });
+    });
+
+    // UI Helpers
+    window.openLeaderboard = () => document.getElementById("leaderboardModal").classList.remove("hidden");
+    window.closeLeaderboard = () => document.getElementById("leaderboardModal").classList.add("hidden");
+</script>
+
 
 </div>
 </body>
