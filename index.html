@@ -1979,10 +1979,10 @@ else if (style === 'azure') {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getDatabase, ref, onValue, set, update, onDisconnect,
-    increment, query, orderByChild, limitToLast, runTransaction
+    increment, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // 🔥 YOUR REAL CONFIG (no placeholders)
+  // 🔥 YOUR REAL CONFIG
   const firebaseConfig = {
     apiKey: "AIzaSyAWp680JEWI6JSj8X8oXlASzKkgHqrYfYg",
     authDomain: "uc-schedule-sorter.firebaseapp.com",
@@ -2084,26 +2084,32 @@ else if (style === 'azure') {
     }).catch(err => console.error("Score update failed:", err));
   };
 
-  // Leaderboard query (with error handling)
+  // ---------- LEADERBOARD (FETCH ALL USERS - NO INDEX NEEDED) ----------
   if (db) {
-    const topUsersQuery = query(ref(db, "users"), orderByChild("score"), limitToLast(10));
-    onValue(topUsersQuery, (snapshot) => {
+    const allUsersRef = ref(db, "users");
+    onValue(allUsersRef, (snapshot) => {
       const list = document.getElementById("leaderboardList");
       if (!list) return;
 
-      list.innerHTML = "";
-      const data = [];
-      snapshot.forEach(child => data.push(child.val()));
-      data.reverse();
+      const usersObj = snapshot.val();
+      console.log("All users from DB:", usersObj);
 
-      if (data.length === 0) {
+      list.innerHTML = "";
+
+      if (!usersObj) {
         list.innerHTML = `<div class="text-center py-8 opacity-50 text-sm">No users yet. Generate a schedule to rank!</div>`;
         return;
       }
 
-      data.forEach((u, i) => {
+      // Convert object to array
+      const data = Object.values(usersObj);
+
+      // Sort by score descending
+      data.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+      // Show top 10
+      data.slice(0, 10).forEach((u, i) => {
         const score = u.score || 0;
-        if (i >= 10) return;
 
         let color = "text-slate-400";
         let icon = `<span class="font-mono opacity-50">#${i+1}</span>`;
@@ -2127,7 +2133,6 @@ else if (style === 'azure') {
       });
     }, (error) => {
       console.error("Leaderboard listener error:", error);
-      // Show error in the list so you know what happened
       const list = document.getElementById("leaderboardList");
       if (list) list.innerHTML = `<div class="text-center py-8 text-red-400">Error: ${error.message}</div>`;
     });
@@ -2136,7 +2141,6 @@ else if (style === 'azure') {
   window.openLeaderboard = () => document.getElementById("leaderboardModal").classList.remove("hidden");
   window.closeLeaderboard = () => document.getElementById("leaderboardModal").classList.add("hidden");
 </script>
-
 
 </div>
 </body>
