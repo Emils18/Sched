@@ -1976,30 +1976,28 @@ else if (style === 'azure') {
 
 
 
-<!-- DATABASEEEEEEEEEEEEEEEEE -->
-
-<script type="module">
+<<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getDatabase, ref, onValue, set, update, onDisconnect,
     increment, query, orderByChild, limitToLast, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // 🔥 REPLACE WITH YOUR REAL FIREBASE CONFIG
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "uc-schedule-sorter.firebaseapp.com",
-    databaseURL: "https://uc-schedule-sorter-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "uc-schedule-sorter",
-    storageBucket: "uc-schedule-sorter.appspot.com",
-    messagingSenderId: "...",
-    appId: "..."
-  };
+  // ✅ YOUR REAL FIREBASE CONFIG (no placeholders!)
+ const firebaseConfig = {
+  apiKey: "AIzaSyAWp680JEWI6JSj8X8oXlASzKkgHqrYfYg",
+  authDomain: "uc-schedule-sorter.firebaseapp.com",
+  databaseURL: "https://uc-schedule-sorter-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "uc-schedule-sorter",
+  storageBucket: "uc-schedule-sorter.firebasestorage.app",
+  messagingSenderId: "595619787016",
+  appId: "1:595619787016:web:c61fc40b0168166d8e3cbd"
+};
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // ========== A. TOTAL VISIT COUNTER (Persistent) ==========
+  // ========== A. TOTAL VISIT COUNTER ==========
   const visitsRef = ref(db, "status/totalVisits");
   runTransaction(visitsRef, (current) => (current || 0) + 1).catch(console.error);
   onValue(visitsRef, (snap) => {
@@ -2040,15 +2038,12 @@ else if (style === 'azure') {
   });
 
   // ========== C. LEADERBOARD ==========
-
-  // 1. Hide register form if user already registered
   const myName = localStorage.getItem("uc_sorter_name");
   if (myName) {
     const regArea = document.getElementById("registerArea");
     if (regArea) regArea.classList.add("hidden");
   }
 
-  // 2. Register / update user
   window.registerUser = function() {
     const nameInput = document.getElementById("usernameInput").value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (nameInput.length < 3) {
@@ -2057,11 +2052,10 @@ else if (style === 'azure') {
     }
     localStorage.setItem("uc_sorter_name", nameInput);
 
-    // ✅ Ensure score field exists (default 0)
     const userRef = ref(db, "users/" + nameInput);
     set(userRef, {
       name: nameInput,
-      score: 0,               // <-- explicit initial score
+      score: 0,
       lastActive: Date.now()
     }).catch(err => {
       console.error("Registration failed:", err);
@@ -2072,7 +2066,6 @@ else if (style === 'azure') {
     alert("Registered as " + nameInput);
   };
 
-  // 3. Add point when schedule is generated
   window.addRankPoint = function() {
     const name = localStorage.getItem("uc_sorter_name");
     if (!name) return;
@@ -2084,7 +2077,6 @@ else if (style === 'azure') {
     }).catch(err => console.error("Score update failed:", err));
   };
 
-  // 4. Render top 10 leaderboard
   const topUsersQuery = query(ref(db, "users"), orderByChild("score"), limitToLast(10));
   onValue(topUsersQuery, (snapshot) => {
     const list = document.getElementById("leaderboardList");
@@ -2092,14 +2084,12 @@ else if (style === 'azure') {
 
     list.innerHTML = "";
     const data = [];
-
     snapshot.forEach(child => data.push(child.val()));
-    data.reverse(); // highest first
+    data.reverse();
 
     data.forEach((u, i) => {
-      // ✅ Treat missing score as 0 and filter out extreme nulls
       const score = u.score || 0;
-      if (i >= 10) return; // safety
+      if (i >= 10) return;
 
       let color = "text-slate-400";
       let icon = `<span class="font-mono opacity-50">#${i+1}</span>`;
@@ -2127,7 +2117,6 @@ else if (style === 'azure') {
     }
   });
 
-  // UI helpers
   window.openLeaderboard = () => document.getElementById("leaderboardModal").classList.remove("hidden");
   window.closeLeaderboard = () => document.getElementById("leaderboardModal").classList.add("hidden");
 </script>
