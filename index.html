@@ -1979,174 +1979,157 @@ else if (style === 'azure') {
 <!-- DATABASEEEEEEEEEEEEEEEEE -->
 
 <script type="module">
-    // 1. IMPORT FIREBASE (Added runTransaction for Visitor Count)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, onDisconnect, increment, query, orderByChild, limitToLast, runTransaction } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getDatabase, ref, onValue, set, update, onDisconnect,
+    increment, query, orderByChild, limitToLast, runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // 2. CONFIGURATION
-    const firebaseConfig = {
-        // --- PASTE YOUR REAL KEYS HERE ---
-        apiKey: "AIzaSy.....", 
-        authDomain: "uc-schedule-sorter.firebaseapp.com",
-        databaseURL: "https://uc-schedule-sorter-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "uc-schedule-sorter",
-        storageBucket: "uc-schedule-sorter.appspot.com",
-        messagingSenderId: "...",
-        appId: "..."
-        // ----------------------------------
-    };
+  // 🔥 REPLACE WITH YOUR REAL FIREBASE CONFIG
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "uc-schedule-sorter.firebaseapp.com",
+    databaseURL: "https://uc-schedule-sorter-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "uc-schedule-sorter",
+    storageBucket: "uc-schedule-sorter.appspot.com",
+    messagingSenderId: "...",
+    appId: "..."
+  };
 
-    // 3. START APP
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    // ==========================================
-    // A. TOTAL VISITOR COUNTER (Persistent)
-    // ==========================================
-    const visitsRef = ref(db, "status/totalVisits");
+  // ========== A. TOTAL VISIT COUNTER (Persistent) ==========
+  const visitsRef = ref(db, "status/totalVisits");
+  runTransaction(visitsRef, (current) => (current || 0) + 1).catch(console.error);
+  onValue(visitsRef, (snap) => {
+    const visits = snap.val() || 0;
+    const el = document.getElementById("headerVisitCount");
+    if (el) el.innerText = visits.toLocaleString() + " VISITS";
+  });
 
-    // 1. Increment Counter safely (Runs once per load)
-    runTransaction(visitsRef, (currentData) => {
-        return (currentData || 0) + 1;
-    });
+  // ========== B. LIVE USER TRACKING ==========
+  const connectedRef = ref(db, ".info/connected");
+  const onlineRef = ref(db, "status/connections");
 
-    // 2. Display Total Visits in Header
-    onValue(visitsRef, (snap) => {
-        const visits = snap.val() || 0;
-        const el = document.getElementById("headerVisitCount");
-        if(el) el.innerText = visits.toLocaleString() + " VISITS";
-    });
+  function getMyDeviceInfo() {
+    const ua = navigator.userAgent;
+    let device = "Desktop PC";
+    if (/iPhone/.test(ua)) device = "iPhone";
+    else if (/iPad/.test(ua)) device = "iPad";
+    else if (/Samsung|SM-|GT-/i.test(ua)) device = "Samsung";
+    else if (/Android/.test(ua)) device = "Android";
+    return { brand: device, resolution: `${window.screen.width}x${window.screen.height}` };
+  }
 
-    // ==========================================
-    // B. LIVE USER TRACKING (Real-time)
-    // ==========================================
-    const connectedRef = ref(db, ".info/connected");
-    const onlineRef = ref(db, "status/connections");
-    
-    function getMyDeviceInfo() {
-        const ua = navigator.userAgent;
-        let device = "Desktop PC";
-        if (/iPhone/.test(ua)) device = "iPhone";
-        else if (/iPad/.test(ua)) device = "iPad";
-        else if (/Samsung|SM-|GT-/i.test(ua)) device = "Samsung";
-        else if (/Android/.test(ua)) device = "Android";
-        
-        return {
-            brand: device,
-            resolution: `${window.screen.width}x${window.screen.height}`
-        };
+  onValue(connectedRef, (snap) => {
+    if (snap.val() === true) {
+      const myPresence = ref(db, "status/connections/" + Date.now());
+      const info = getMyDeviceInfo();
+      set(myPresence, { ...info, state: "online" });
+      onDisconnect(myPresence).remove();
     }
+  });
 
-    onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-            const myPresence = ref(db, "status/connections/" + Date.now());
-            const info = getMyDeviceInfo();
+  onValue(onlineRef, (snap) => {
+    const count = snap.size || 0;
+    const elModal = document.getElementById("activeUserCount");
+    const elHeader = document.getElementById("headerOnlineCount");
+    if (elModal) elModal.innerText = count + " ONLINE";
+    if (elHeader) elHeader.innerText = count + " LIVE";
+  });
 
-            set(myPresence, {
-                brand: info.brand,
-                screen: info.resolution,
-                state: "online"
-            });
+  // ========== C. LEADERBOARD ==========
 
-            onDisconnect(myPresence).remove();
-        }
-    });
+  // 1. Hide register form if user already registered
+  const myName = localStorage.getItem("uc_sorter_name");
+  if (myName) {
+    const regArea = document.getElementById("registerArea");
+    if (regArea) regArea.classList.add("hidden");
+  }
 
-    // UPDATE LIVE COUNTS (Header & Modal)
-    onValue(onlineRef, (snap) => {
-        const count = snap.size || 0;
-        
-        // 1. Update Leaderboard Modal
-        const elModal = document.getElementById("activeUserCount");
-        if(elModal) elModal.innerText = count + " ONLINE";
-
-        // 2. Update Main Header
-        const elHeader = document.getElementById("headerOnlineCount");
-        if(elHeader) elHeader.innerText = count + " LIVE";
-    });
-
-    // ==========================================
-    // C. LEADERBOARD LOGIC
-    // ==========================================
-    
-    // Auto-hide register if already done
-    const myName = localStorage.getItem("uc_sorter_name");
-    if(myName) {
-        const regArea = document.getElementById("registerArea");
-        if(regArea) regArea.classList.add("hidden");
+  // 2. Register / update user
+  window.registerUser = function() {
+    const nameInput = document.getElementById("usernameInput").value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (nameInput.length < 3) {
+      alert("Name too short! 3 chars min.");
+      return;
     }
+    localStorage.setItem("uc_sorter_name", nameInput);
 
-    // Register Function
-    window.registerUser = function() {
-        const nameInput = document.getElementById("usernameInput").value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        if(nameInput.length < 3) { alert("Name too short! 3 chars min."); return; }
-        
-        localStorage.setItem("uc_sorter_name", nameInput);
-        
-        update(ref(db, "users/" + nameInput), {
-            name: nameInput,
-            lastActive: Date.now()
-        });
-        
-        document.getElementById("registerArea").classList.add("hidden");
-        alert("Registered as " + nameInput);
-    };
-
-    // Add Point Function (Connected to Generate button)
-    window.addRankPoint = function() {
-        const name = localStorage.getItem("uc_sorter_name");
-        if(name) {
-            const userRef = ref(db, "users/" + name);
-            update(userRef, {
-                score: increment(1),
-                lastActive: Date.now()
-            });
-        }
-    };
-
-    // Render Leaderboard List
-    const topUsers = query(ref(db, "users"), orderByChild("score"), limitToLast(10));
-    
-    onValue(topUsers, (snapshot) => {
-        const list = document.getElementById("leaderboardList");
-        if(!list) return;
-        
-        list.innerHTML = "";
-        let data = [];
-        
-        snapshot.forEach((child) => {
-            data.push(child.val());
-        });
-        
-        data.reverse(); 
-
-        data.forEach((u, i) => {
-            let color = "text-slate-400";
-            let icon = `<span class="font-mono opacity-50">#${i+1}</span>`;
-            let bg = "bg-slate-800/50";
-            
-            if(i===0) { color="text-yellow-400"; icon="👑"; bg="bg-yellow-500/10 border-yellow-500/30"; }
-            if(i===1) { color="text-slate-300"; icon="🥈"; }
-            if(i===2) { color="text-amber-600"; icon="🥉"; }
-
-            list.innerHTML += `
-            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-700/50 ${bg}">
-                <div class="flex items-center gap-3">
-                    <div class="w-6 text-center font-bold ${color}">${icon}</div>
-                    <span class="font-bold text-white tracking-wide text-xs">${u.name}</span>
-                </div>
-                <div class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded text-[10px] border border-slate-700">
-                    <i class="fa-solid fa-bolt text-blue-400"></i>
-                    <span class="text-blue-200 font-mono">${u.score || 0}</span>
-                </div>
-            </div>`;
-        });
+    // ✅ Ensure score field exists (default 0)
+    const userRef = ref(db, "users/" + nameInput);
+    set(userRef, {
+      name: nameInput,
+      score: 0,               // <-- explicit initial score
+      lastActive: Date.now()
+    }).catch(err => {
+      console.error("Registration failed:", err);
+      alert("Could not register – check Firebase rules.");
     });
 
-    // UI Helpers
-    window.openLeaderboard = () => document.getElementById("leaderboardModal").classList.remove("hidden");
-    window.closeLeaderboard = () => document.getElementById("leaderboardModal").classList.add("hidden");
+    document.getElementById("registerArea").classList.add("hidden");
+    alert("Registered as " + nameInput);
+  };
+
+  // 3. Add point when schedule is generated
+  window.addRankPoint = function() {
+    const name = localStorage.getItem("uc_sorter_name");
+    if (!name) return;
+
+    const userRef = ref(db, "users/" + name);
+    update(userRef, {
+      score: increment(1),
+      lastActive: Date.now()
+    }).catch(err => console.error("Score update failed:", err));
+  };
+
+  // 4. Render top 10 leaderboard
+  const topUsersQuery = query(ref(db, "users"), orderByChild("score"), limitToLast(10));
+  onValue(topUsersQuery, (snapshot) => {
+    const list = document.getElementById("leaderboardList");
+    if (!list) return;
+
+    list.innerHTML = "";
+    const data = [];
+
+    snapshot.forEach(child => data.push(child.val()));
+    data.reverse(); // highest first
+
+    data.forEach((u, i) => {
+      // ✅ Treat missing score as 0 and filter out extreme nulls
+      const score = u.score || 0;
+      if (i >= 10) return; // safety
+
+      let color = "text-slate-400";
+      let icon = `<span class="font-mono opacity-50">#${i+1}</span>`;
+      let bg = "bg-slate-800/50";
+
+      if (i === 0) { color = "text-yellow-400"; icon = "👑"; bg = "bg-yellow-500/10 border-yellow-500/30"; }
+      else if (i === 1) { color = "text-slate-300"; icon = "🥈"; }
+      else if (i === 2) { color = "text-amber-600"; icon = "🥉"; }
+
+      list.innerHTML += `
+        <div class="flex items-center justify-between p-3 rounded-xl border border-slate-700/50 ${bg}">
+          <div class="flex items-center gap-3">
+            <div class="w-6 text-center font-bold ${color}">${icon}</div>
+            <span class="font-bold text-white tracking-wide text-xs">${u.name}</span>
+          </div>
+          <div class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded text-[10px] border border-slate-700">
+            <i class="fa-solid fa-bolt text-blue-400"></i>
+            <span class="text-blue-200 font-mono">${score}</span>
+          </div>
+        </div>`;
+    });
+
+    if (data.length === 0) {
+      list.innerHTML = `<div class="text-center py-8 opacity-50 text-sm">No users yet. Be the first to generate a schedule!</div>`;
+    }
+  });
+
+  // UI helpers
+  window.openLeaderboard = () => document.getElementById("leaderboardModal").classList.remove("hidden");
+  window.closeLeaderboard = () => document.getElementById("leaderboardModal").classList.add("hidden");
 </script>
 
 
