@@ -289,7 +289,13 @@
 
                 <div class="flex justify-between items-center mb-4">
                     <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Paste Schedule Table</label>
+
                     <div class="flex gap-2">
+                         <button onclick="quickRepairText()" class="text-[10px] bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-3 py-1 rounded hover:bg-yellow-500/20 transition">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Quick Repair
+    </button>
+
+
                         <button onclick="clearData()" class="text-[10px] bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1 rounded hover:bg-red-500/20 transition">
                             <i class="fa-solid fa-trash"></i> Clear
                         </button>
@@ -297,6 +303,8 @@
                             CTRL + V
                         </div>
                     </div>
+
+
                 </div>
 
                 <textarea id="rawInput" class="w-full h-40 bg-transparent resize-none text-sm md:text-base font-mono text-slate-200 placeholder-slate-600 border-b border-slate-700 focus:border-blue-500 transition-colors" 
@@ -1554,6 +1562,12 @@ else if (style === 'azure') {
         });
     }
 
+
+
+
+
+
+
     // PDF, Drag & Drop, and Init Utils...
 async function handlePDF(input) {
     const file = input.files[0];
@@ -1643,6 +1657,12 @@ async function handlePDF(input) {
 
 
 
+
+
+
+
+
+
   function processSchedule() {
     let raw = document.getElementById('rawInput').value;
     if (!raw.trim()) { alert("Paste text first!"); return; }
@@ -1653,18 +1673,12 @@ async function handlePDF(input) {
     // --- STEP 1: CLEAN THE WEIRD CHARACTERS ---
     let cleanRaw = raw
         .replace(/\t/g, ' ')
-        // 1. THIS IS THE KEY FIX: Replace the weird "Ratio" symbol with a normal Colon
         .replace(/∶/g, ':') 
-        .replace(/：/g, ':') // Just in case full-width colon exists too
-        
-        // 2. Fix Dash types
+        .replace(/：/g, ':') 
         .replace(/–|—/g, '-')
-        
-        // 3. Fix "Stuck" Time (e.g. 1:30PM -> 1:30 PM)
-        .replace(/(\d{1,2}:\d{2})([AP]M)/gi, '$1 $2')
+        .replace(/(\d{1,2}:\d{2})\s*([AP]M)/gi, '$1 $2')
         .replace(/([AP]M)-(\d)/gi, '$1 - $2')
-        
-        // 4. Collapse spaces
+        .replace(/\s*-\s*/g, ' - ')
         .replace(/\s+/g, ' ');
 
     const lines = cleanRaw.split(/(?=\b\d{5}\b)/); // Split by EDP
@@ -1674,9 +1688,7 @@ async function handlePDF(input) {
     lines.forEach(line => {
         line = line.trim();
 
-        // MATCH: EDP (5 digits) ... TIME (00:00 AM/PM)
         const edpMatch = line.match(/^(\d{5})\b/);
-        // Updated Regex to be very flexible with the time format
         const timeMatch = line.match(/(\d{1,2}:\d{2}\s*[AP]M\s*-\s*\d{1,2}:\d{2}\s*[AP]M)/i);
 
         if (edpMatch && timeMatch) {
@@ -1691,24 +1703,20 @@ async function handlePDF(input) {
 
             // DETECT TYPE
             let type = "LEC";
-            if (line.match(/\s(L|LAB|LB)\s/)) type = "LAB";
+            if (line.match(/\s(L|LAB|LB)\s/i) || line.match(/ L \d/i)) type = "LAB";
 
             // EXTRACT SUBJECT (Between EDP and Time)
-            // We strip out the specific junk found in your log (Units "3", "2", "1")
             let middleChunk = line.substring(5, line.indexOf(time)).trim();
             
             let subject = middleChunk
                 .replace(/\b(MWF|TTH|SAT|MW|T|TH|S)\b/gi, '') // Remove Days
                 .replace(/\b(L|LAB|LEC)\b/g, '')             // Remove Type letter
-                .replace(/\b\d\b/g, '')                      // Remove the "3", "2", "1" units
+                .replace(/\b\d\b/g, '')                      // Remove units
                 .replace(/\s+/g, ' ')                        // Clean spaces
                 .trim();
 
-            // EXTRACT ROOM (After time)
-            let afterTime = line.substring(line.indexOf(time) + time.length).trim();
-            let room = afterTime.split(' ')[0] || "TBA";
-            // Ignore "BSIT" or "BSCS" if it gets picked up as a room
-            if (room.length < 2 || room === "BSIT" || room === "BSCS") room = "TBA";
+            // EXTRACT AND CLEAN ROOM (Uses the helper below)
+            let room = extractRoom(line, time);
 
             // ASSIGN
             let group = 'mwf';
@@ -1738,10 +1746,49 @@ async function handlePDF(input) {
         if(label) label.innerHTML = `<i class="fa-solid fa-check text-green-400"></i> Success`;
          if(window.addRankPoint) window.addRankPoint();
     } else {
-        console.log("Still Failed Raw:", raw); // Keep logging just in case
-        alert("Still failing. Please check console.");
+        console.log("Parsing Failed Raw:", raw);
+        alert("Failed to parse schedule. Please check format.");
     }
 }
+
+function extractRoom(line, time) {
+    let afterTime = line.substring(line.indexOf(time) + time.length).trim();
+
+    // Fix: Re-join any separated room hyphens (e.g., "A2 - 404" -> "A2-404")
+    afterTime = afterTime.replace(/([A-Za-z0-9]+)\s*-\s*(\d+)/g, '$1-$2');
+
+    let roomToken = afterTime.split(' ')[0] || "TBA";
+
+    // Standardize and map messy OCR rooms to clean targets
+    let cleanRoom = roomToken
+        .replace(/^cl$/i, 'C1')
+        .replace(/^\[e\]$/i, 'C2')
+        .replace(/^\[ec\}$/i, 'C3')
+        .replace(/^a$/i, 'C1')
+        .replace(/^c1$/i, 'C1')
+        .replace(/^c2$/i, 'C2')
+        .replace(/^c3$/i, 'C3')
+        .replace(/^c4$/i, 'C4')
+        .replace(/^2H$/i, '211')
+        .replace(/^Z1$/i, '211')
+        .replace(/^A2-48[48]$/i, 'A2-404')
+        .trim();
+
+    // If the room name is empty, too short, or matched group words, fallback to TBA
+    if (cleanRoom.length < 2 || cleanRoom === "BSIT" || cleanRoom === "BSCS" || cleanRoom === "TBA") {
+        return "TBA";
+    }
+
+    return cleanRoom;
+}
+
+
+
+
+
+
+
+
 
     function parseTime(t) {
         let [time, mod] = t.split(/([AP]M)/i);
@@ -1801,6 +1848,23 @@ async function handlePDF(input) {
     function openTemplateModal() { document.getElementById('templateModal').classList.remove('hidden'); }
     function closeTemplateModal() { document.getElementById('templateModal').classList.add('hidden'); }
     function clearData() { if(confirm("Clear data?")) { localStorage.removeItem('uc_schedule_data'); location.reload(); } }
+    function quickRepairText() {
+    let input = document.getElementById('rawInput');
+    if (!input.value.trim()) return;
+
+    input.value = input.value
+        .replace(/[\[\{]e[\]\}]/gi, ' C2 ')
+        .replace(/[\[\{]ec[\]\}]/gi, ' C3 ')
+        .replace(/\bcl\b/gi, ' C1 ')         
+        .replace(/\ba\b(?=\s|$)/gi, ' C1 ')   
+        .replace(/∶|：/g, ':')               
+        .replace(/–|—/g, '-')                
+        .replace(/\s+/g, ' ')                
+        .trim();
+
+    showSmartToast("System Assistant", "Applied quick repair!", "1.0", "fa-wand-magic-sparkles");
+}
+
     function toggleVideo() { document.getElementById('videoModal').classList.toggle('hidden'); }
     function loadExample() {
         document.getElementById('rawInput').value = `41200 CC-TECHNO32 3 MWF 3:30 PM - 4:30 PM A2-404\n17192 IT-ELECT2 2 SAT 8:30 AM - 10:30 AM M1`;
