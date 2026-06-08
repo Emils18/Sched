@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC Schedule Sorter</title>
+    <title>Study Load Sorter AI – UCLM Schedule Organizer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTML2CANVAS -->
@@ -20,7 +20,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <script>
 
@@ -1555,34 +1555,93 @@ else if (style === 'azure') {
     }
 
     // PDF, Drag & Drop, and Init Utils...
-    async function handlePDF(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const labelSpan = document.getElementById('pdfLabel');
-        labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Reading...`;
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            let fullText = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                let items = textContent.items.sort((a, b) => {
-                    if (Math.abs(a.transform[5] - b.transform[5]) > 4) return b.transform[5] - a.transform[5];
-                    return a.transform[4] - b.transform[4];
-                });
-                let lastY = -1; let lastX = -1;
-                for (let item of items) {
-                    let cX = item.transform[4]; let cY = item.transform[5];
-                    if (lastY !== -1 && Math.abs(cY - lastY) > 4) fullText += "\n";
-                    else if (lastX !== -1 && (cX - lastX) > 6) fullText += " ";
-                    fullText += item.str; lastY = cY; lastX = cX + (item.width || 0);
+async function handlePDF(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const labelSpan = document.getElementById('pdfLabel');
+    labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Reading PDF...`;
+
+    let worker = null;
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        let allLines = [];
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+
+            if (textContent.items.length > 0) {
+                // Regular searchable PDF
+                const pageLines = textContent.items.map(item => item.str.trim()).filter(str => str.length > 0);
+                allLines.push(...pageLines);
+                console.log(`Page ${pageNum}: Extracted ${pageLines.length} text items`);
+            } else {
+                // Scanned PDF → OCR
+                labelSpan.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> OCR processing page ${pageNum}/${pdf.numPages}...`;
+                console.log(`Page ${pageNum}: No selectable text → running OCR`);
+
+                // Render page to canvas
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                // Initialize worker (once) and recognize
+                if (!worker) {
+                    worker = await Tesseract.createWorker('eng', 1, {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                console.log(`OCR progress: ${Math.round(m.progress * 100)}%`);
+                            }
+                        }
+                    });
+                }
+
+                const { data: { text } } = await worker.recognize(canvas);
+
+                if (text && text.trim().length > 0) {
+                    const ocrLines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    allLines.push(...ocrLines);
+                    console.log(`Page ${pageNum}: OCR extracted ${ocrLines.length} lines`);
+                } else {
+                    console.warn(`Page ${pageNum}: OCR returned no text`);
+                    allLines.push(`[OCR could not extract text from page ${pageNum}]`);
                 }
             }
-            document.getElementById('rawInput').value = fullText;
-            labelSpan.innerHTML = `<i class="fa-solid fa-check"></i> Loaded!`;
-        } catch (e) { alert("PDF Error: " + e.message); }
+        }
+
+        // Success
+        document.getElementById('rawInput').value = allLines.join('\n');
+        labelSpan.innerHTML = `<i class="fa-solid fa-check text-green-600"></i> PDF processed successfully`;
+        
+        processSchedule();
+
+    } catch (e) {
+        console.error('PDF/OCR Error:', e);
+        labelSpan.innerHTML = `<i class="fa-solid fa-exclamation-triangle text-red-600"></i> Processing failed`;
+
+        const rawInput = document.getElementById('rawInput');
+        rawInput.value = `OCR processing failed.\n\n` +
+            `Please manually copy and paste your study load schedule from the PDF into this box.\n\n` +
+            `Tip: Open the PDF in your browser or Adobe Reader → Select all (Ctrl+A) → Copy (Ctrl+C) → Paste here.`;
+
+        processSchedule();
+    } finally {
+        // Always terminate the worker to free memory
+        if (worker) {
+            await worker.terminate();
+        }
     }
+}
+
+
+
 
   function processSchedule() {
     let raw = document.getElementById('rawInput').value;
